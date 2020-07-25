@@ -9,6 +9,7 @@ defmodule Phail.Application do
     children = [
       # Starts a worker by calling: Phail.Worker.start_link(arg)
       # {Phail.Worker, arg}
+      Phail.Repo
     ]
 
     # See https://hexdocs.pm/elixir/Supervisor.html

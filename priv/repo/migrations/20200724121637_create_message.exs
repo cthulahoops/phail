@@ -3,13 +3,13 @@ defmodule Phail.Repo.Migrations.CreateMessage do
 
   def change do
     create table(:messages) do
-      add :subject, :string
-      add :body, :string
+      add :subject, :text
+      add :body, :text
     end
 
     create table(:addresses) do
-      add :address, :string, null: false
-      add :name, :string
+      add :address, :text, null: false
+      add :name, :text
     end
   end
 end

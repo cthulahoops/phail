@@ -28,8 +28,9 @@ defmodule Phail.Address do
 
   def get_or_create(%{address: address, name: name}) do
     case Repo.get_by(Address, address: address, name: name) do
-      :nil ->
+      nil ->
         %Address{address: address, name: name} |> Repo.insert!()
+
       address ->
         address
     end

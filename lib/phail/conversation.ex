@@ -32,13 +32,8 @@ defmodule Phail.Conversation do
   end
 
   defp text_search(search_term) do
-    from c in Conversation,
-      join: m in Message,
-      on: c.id == m.conversation_id,
-      select: %{c | date: max(m.date)},
-      order_by: [desc: max(m.date)],
-      group_by: c.id,
-      where: fulltext(space_join(m.body, m.subject), ^search_term)
+    select_conversations()
+    |> where([_c, m], fulltext(space_join(m.body, m.subject), ^search_term))
   end
 
   def get(id) do

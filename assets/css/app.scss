@@ -95,12 +95,12 @@
   width: 80%;
 }
 
-.conversation > .from {
+.conversation .from {
   display: inline-block;
   width: 30%;
 }
 
-.conversation > .subject {
+.conversation .subject {
   display: inline-block;
   text-overflow: ellipsis;
   white-space: nowrap;
@@ -117,6 +117,7 @@
 }
 
 .message {
+  border-radius: 0.5em;
   border: 1px solid #a577b5;
   padding: 1em;
 }

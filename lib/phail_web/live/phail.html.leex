@@ -1,0 +1,52 @@
+<form phx-submit="update_filter">
+  <input name=filter placeholder="Search mail..." value="<%= @search_filter %>"</input>
+</form>
+
+<ul class=mailbox>
+<%= for conversation <- @conversations do %>
+  <li class="conversation">
+    <div class="conversation_header" phx-value-id="<%= conversation.id %>" phx-click="expand">
+      <%= conversation.id %>
+      <span class=subject><%= conversation.subject %></span>
+      <span class=date><%= conversation.date %></span>
+    </div>
+    <%= if conversation.id == @expanded_id do %>
+    <div class="conversation_contents">
+      <%= for message <- @expanded_conversation.messages do %>
+      <div class=message>
+        <ul>
+        <li>
+        From:
+        <%= for address <- message.from_addresses do %>
+           <span class=address title="<%= address.address %>"><%= Phail.Address.display address %></span>
+        <% end %>
+        </li>
+        <li>
+        To:
+        <%= for address <- message.to_addresses do %>
+           <span class=address title="<%= address.address %>"><%= Phail.Address.display address %></span>
+        <% end %>
+        </li>
+        <%= if message.cc_addresses != [] do %>
+        <li>
+        Cc:
+        <%= for address <- message.cc_addresses do %>
+           <span class=address title="<%= address.address %>"><%= Phail.Address.display address %></span>
+        <% end %>
+        <% end %>
+        </li>
+        <li>
+        Date: <%= message.date %>
+        </li>
+        </ul>
+
+        <div class=body>
+        <%= Phoenix.HTML.raw message.body %>
+        </div>
+      </div>
+      <% end %>
+    </div>
+    <% end %>
+  </li>
+<% end %>
+</ul>

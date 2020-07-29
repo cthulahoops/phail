@@ -5,10 +5,12 @@ defmodule Phail.Message do
   alias Phail.Message
   alias Phail.Repo
   alias Phail.Address
+  alias Phail.Conversation
 
   schema "messages" do
     field(:subject, :string)
     field(:body, :string)
+    belongs_to(:conversation, Conversation)
 
     many_to_many(
       :from_addresses,

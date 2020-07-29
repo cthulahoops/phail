@@ -7,17 +7,14 @@ defmodule Phail.Conversation do
   alias Phail.Repo
 
   schema "conversations" do
-    field(:subject, :string)
+    field :subject, :string
+    field :date, :utc_datetime, virtual: true
 
     has_many(:messages, Message)
   end
 
-  def all() do
-    Conversation |> Repo.all()
-  end
-
   def search("") do
-    Conversation |> Repo.all()
+    select_conversations() |> Repo.all()
   end
 
   def search(search_term) do
@@ -25,11 +22,22 @@ defmodule Phail.Conversation do
     |> Repo.all()
   end
 
-  defp text_search(search_term) do
+  defp select_conversations() do
     from c in Conversation,
-      distinct: c.id,
       join: m in Message,
       on: c.id == m.conversation_id,
+      select: %{c | date: max(m.date)},
+      group_by: c.id,
+      order_by: [desc: max(m.date)]
+  end
+
+  defp text_search(search_term) do
+    from c in Conversation,
+      join: m in Message,
+      on: c.id == m.conversation_id,
+      select: %{c | date: max(m.date)},
+      order_by: [desc: max(m.date)],
+      group_by: c.id,
       where: fulltext(space_join(m.body, m.subject), ^search_term)
   end
 

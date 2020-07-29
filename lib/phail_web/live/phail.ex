@@ -1,5 +1,5 @@
 defmodule PhailWeb.Live.Phail do
- # alias Phail.Message
+  # alias Phail.Message
   alias Phail.Conversation
   use Phoenix.LiveView
 
@@ -10,7 +10,7 @@ defmodule PhailWeb.Live.Phail do
   def mount(_params, _session, socket) do
     {:ok,
      socket
-     |> assign(:conversations, Conversation.all())
+     |> assign(:conversations, Conversation.search(""))
      |> assign(:expanded_id, nil)
      |> assign(:expanded_conversation, nil)
      |> assign(:search_filter, "")}
@@ -25,16 +25,19 @@ defmodule PhailWeb.Live.Phail do
 
   def handle_event("expand", %{"id" => conversation_id}, socket) do
     conversation_id = String.to_integer(conversation_id)
+
     if conversation_id == socket.assigns.expanded_id do
       socket
       |> assign(:expanded_id, nil)
       |> assign(:expanded_conversation, nil)
     else
       conversation = Conversation.get(conversation_id)
+
       socket
       |> assign(:expanded_id, conversation.id)
       |> assign(:expanded_conversation, conversation)
-    end |> noreply
+    end
+    |> noreply
   end
 
   def render(assigns) do
@@ -48,6 +51,7 @@ defmodule PhailWeb.Live.Phail do
       <li phx-value-id="<%= conversation.id %>" class="conversation" phx-click="expand">
         <%= conversation.id %>
         <span class=subject><%= conversation.subject %></span>
+        <span class=date><%= conversation.date %></span>
         <%= if conversation.id == @expanded_id do %>
           <%= for message <- @expanded_conversation.messages do %>
           <div class=message>
@@ -87,6 +91,5 @@ defmodule PhailWeb.Live.Phail do
     <% end %>
     </ul>
     """
-
   end
 end

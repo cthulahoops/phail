@@ -10,6 +10,7 @@ defmodule Phail.Message do
   schema "messages" do
     field(:subject, :string)
     field(:body, :string)
+    field(:date, :utc_datetime)
     belongs_to(:conversation, Conversation)
 
     many_to_many(

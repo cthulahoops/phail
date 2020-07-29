@@ -30,13 +30,18 @@ defmodule Phail.Conversation do
       distinct: c.id,
       join: m in Message,
       on: c.id == m.conversation_id,
-      where:
-        fulltext(space_join(m.body, m.subject), ^search_term)
+      where: fulltext(space_join(m.body, m.subject), ^search_term)
   end
 
   def get(id) do
     Conversation
     |> Repo.get(id)
-    |> Repo.preload([messages: [:from_addresses, :to_addresses, :cc_addresses]])
+    |> Repo.preload(
+      messages:
+        from(m in Message,
+          order_by: m.date,
+          preload: [:from_addresses, :to_addresses, :cc_addresses]
+        )
+    )
   end
 end

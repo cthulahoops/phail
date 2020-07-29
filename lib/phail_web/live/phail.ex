@@ -72,6 +72,9 @@ defmodule PhailWeb.Live.Phail do
             <% end %>
             <% end %>
             </li>
+            <li>
+            Date: <%= message.date %>
+            </li>
             </ul>
 
             <div class=body>

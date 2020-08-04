@@ -26,14 +26,14 @@ def get_address(address):
 
 def insert_assoc(assoc_type, message_id, address_id):
     table_name = f"message_{assoc_type}_address"
-    sql = f"insert into {table_name} (message_id, address_id) values (%s, %s)"
+    sql = f"insert into {table_name} (message_id, address_id) values (%s, %s) on conflict do nothing"
     cursor = dbh.cursor()
     cursor.execute(sql, (message_id, address_id))
 
 def insert_reference(message_id, reference):
     with dbh.cursor() as cursor:
         cursor.execute(
-            "insert into message_references (message_id, reference) values (%s, %s)", (
+            "insert into message_references (message_id, reference) values (%s, %s) on conflict do nothing", (
                 message_id,
                 reference))
 
@@ -108,8 +108,12 @@ def insert_message(message):
 
 def main():
     for item in pathlib.Path(sys.argv[1]).iterdir():
-        message = Message(open(item, mode='rb'))
-        insert_message(message)
+        try:
+            message = Message(open(item, mode='rb'))
+            insert_message(message)
+        except:
+            print("Failed to load: ", item)
+            raise
 
 if __name__ == '__main__':
     main()

@@ -12,6 +12,7 @@ CHARSET_ALIASES = {
     "unknown-8bit": "latin1",
     "windows-874": "cp874",
     "default": "utf-8",
+    "": "utf-8",
 }
 
 
@@ -43,8 +44,14 @@ class Message:
         self.text = fh.read()
         self.filename = filename
         self.mail = email.message_from_bytes(self.text)
-        self.subject = decode_header(self.mail.get("subject"))
-        self.message_id = self.mail.get("message-id")
+
+    @property
+    def message_id(self):
+        return self.mail.get("message-id")
+
+    @property
+    def subject(self):
+        return decode_header(self.mail.get("subject", ""))
 
     @property
     def is_unread(self):
@@ -54,7 +61,10 @@ class Message:
     def date(self):
         datestr = self.mail.get("date")
         if not datestr:
-            return parse_date(self.mail.get("Received").split(";")[-1])
+            received = self.mail.get("Received")
+            if not received:
+                return None
+            return parse_date(received.split(";")[-1])
         return parse_date(datestr)
 
     def addresses(self, address_type):
@@ -62,7 +72,7 @@ class Message:
         if headers:
             return [
                 {"name": decode_header(name), "email": address}
-                for (name, address) in email.utils.getaddresses(headers)
+                for (name, address) in email.utils.getaddresses(map(str, headers))
             ]
         return []
 
@@ -107,8 +117,10 @@ def decode(mail):
 
 
 def decode_charset(text, charset):
-    if charset is None:
+    if isinstance(text, str):
         return text
+    if charset is None:
+        return text.decode(errors='replace')
     charset = charset.lower().strip()
     charset = CHARSET_ALIASES.get(charset, charset)
     return text.decode(encoding=charset, errors="ignore")

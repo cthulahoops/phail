@@ -24,6 +24,12 @@ def get_address(address):
         address['email']))
     return (cursor.fetchone() or create_address(address))[0]
 
+def insert_conversation_from(conversation_id, address_id):
+    table_name = f"conversation_from_address"
+    sql = f"insert into {table_name} (conversation_id, address_id) values (%s, %s) on conflict do nothing"
+    cursor = dbh.cursor()
+    cursor.execute(sql, (conversation_id, address_id))
+
 def insert_assoc(assoc_type, message_id, address_id):
     table_name = f"message_{assoc_type}_address"
     sql = f"insert into {table_name} (message_id, address_id) values (%s, %s) on conflict do nothing"
@@ -104,6 +110,9 @@ def insert_message(message):
     with dbh.cursor() as cursor:
         cursor.execute("update messages set conversation_id = %s where id = %s",
             (conversation_id, message_id))
+
+    for address_id in from_addresses:
+        insert_conversation_from(conversation_id, address_id)
 
 
 def main():

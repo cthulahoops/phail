@@ -90,14 +90,31 @@
   display: none;
 }
 
+body {
+  background: #eeeeee;
+}
+
 .mailbox {
   list-style: none;
   width: 80%;
 }
 
-.conversation .from {
+.conversation ul.from {
   display: inline-block;
   width: 30%;
+  list-style: none;
+}
+
+.conversation ul.from li {
+  display: inline;
+}
+
+.conversation ul.from li::after {
+  content: ", ";
+}
+
+.conversation ul.from li:last-child::after {
+  content: "";
 }
 
 .conversation .subject {
@@ -105,7 +122,7 @@
   text-overflow: ellipsis;
   white-space: nowrap;
   overflow: hidden;
-  width: 60%;
+  width: 50%;
 }
 
 .conversation {
@@ -120,6 +137,8 @@
   border-radius: 0.5em;
   border: 1px solid #a577b5;
   padding: 1em;
+  background-color: white;
+  width: 80%;
 }
 
 .body {

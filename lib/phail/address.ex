@@ -34,6 +34,14 @@ defmodule Phail.Address do
     end
   end
 
+  def display_short(%Address{address: address, name: name}) do
+    if name == "" do
+      address
+    else
+      name
+    end
+  end
+
   def get_or_create(%{address: address, name: name}) do
     case Repo.get_by(Address, address: address, name: name) do
       nil ->

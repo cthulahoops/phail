@@ -2,6 +2,7 @@ defmodule Phail.Conversation do
   import Ecto.Query
   import Phail.TextSearch
   use Ecto.Schema
+  alias Phail.Address
   alias Phail.Message
   alias Phail.Conversation
   alias Phail.Repo
@@ -11,6 +12,7 @@ defmodule Phail.Conversation do
     field :date, :utc_datetime, virtual: true
 
     has_many(:messages, Message)
+    many_to_many(:from_addresses, Address, join_through: "conversation_from_address")
   end
 
   def search("") do
@@ -28,7 +30,9 @@ defmodule Phail.Conversation do
       on: c.id == m.conversation_id,
       select: %{c | date: max(m.date)},
       group_by: c.id,
-      order_by: [desc: max(m.date)]
+      order_by: [desc: max(m.date)],
+      limit: 20,
+      preload: [:from_addresses]
   end
 
   defp text_search(search_term) do

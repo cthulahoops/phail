@@ -6,7 +6,11 @@
 <%= for conversation <- @conversations do %>
   <li class="conversation">
     <div class="conversation_header" phx-value-id="<%= conversation.id %>" phx-click="expand">
-      <%= conversation.id %>
+      <ul class="from">
+      <%= for address <- conversation.from_addresses do %>
+        <li><%= Phail.Address.display_short address %></li>
+      <% end %>
+      </ul>
       <span class=subject><%= conversation.subject %></span>
       <span class=date><%= conversation.date %></span>
     </div>

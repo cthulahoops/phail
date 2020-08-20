@@ -7,8 +7,12 @@
   <li class="conversation">
     <div class="conversation_header" phx-value-id="<%= conversation.id %>" phx-click="expand">
       <ul class="from">
+      <%= if length(conversation.from_addresses) == 1 do %>
+        <li><%= Phail.Address.display_name hd(conversation.from_addresses) %></li>
+      <% else %>
       <%= for address <- conversation.from_addresses do %>
         <li><%= Phail.Address.display_short address %></li>
+      <% end %>
       <% end %>
       </ul>
       <span class=subject><%= conversation.subject %></span>

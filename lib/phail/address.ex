@@ -34,11 +34,19 @@ defmodule Phail.Address do
     end
   end
 
-  def display_short(%Address{address: address, name: name}) do
+  def display_name(%Address{address: address, name: name}) do
     if name == "" do
       address
     else
       name
+    end
+  end
+
+  def display_short(%Address{address: address, name: name}) do
+    if name == "" do
+      address
+    else
+      hd(String.split(name, " "))
     end
   end
 

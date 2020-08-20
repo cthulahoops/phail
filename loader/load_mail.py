@@ -1,5 +1,6 @@
 import sys
 import pathlib
+import mailbox
 
 import psycopg2
 
@@ -115,14 +116,27 @@ def insert_message(message):
         insert_conversation_from(conversation_id, address_id)
 
 
+def iter_dir_messages(directory_name):
+    for item in pathlib.Path(directory_name).iterdir():
+        yield Message(open(item, mode='rb').read())
+
+def iter_file_messages(filename):
+    mbox = mailbox.mbox(filename)
+
+    for message in mbox:
+        yield Message(message.as_bytes())
+
 def main():
-    for item in pathlib.Path(sys.argv[1]).iterdir():
+    i = 0
+    for message in iter_file_messages(sys.argv[1]):
         try:
-            message = Message(open(item, mode='rb'))
             insert_message(message)
         except:
-            print("Failed to load: ", item)
+            print("Failed to load: ", message)
             raise
+        if i % 100 == 0:
+            print(i)
+        i += 1
 
 if __name__ == '__main__':
     main()

@@ -38,10 +38,10 @@ def parse_date(datestr):
 
 
 class Message:
-    def __init__(self, fh, filename=None):
+    def __init__(self, text, filename=None):
         # if not filename:
         #     filename = fh.name
-        self.text = fh.read()
+        self.text = text
         self.filename = filename
         self.mail = email.message_from_bytes(self.text)
 

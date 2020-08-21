@@ -6,6 +6,7 @@ defmodule Phail.Message do
   alias Phail.Repo
   alias Phail.Address
   alias Phail.Conversation
+  alias Phail.Label
 
   schema "messages" do
     field(:subject, :string)
@@ -29,6 +30,12 @@ defmodule Phail.Message do
       :cc_addresses,
       Address,
       join_through: "message_cc_address"
+    )
+
+    many_to_many(
+      :labels,
+      Label,
+      join_through: "message_labels"
     )
   end
 

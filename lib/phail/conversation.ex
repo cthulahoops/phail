@@ -6,21 +6,22 @@ defmodule Phail.Conversation do
   alias Phail.Message
   alias Phail.Conversation
   alias Phail.Repo
+  alias Phail.Query
 
   schema "conversations" do
     field :subject, :string
     field :date, :utc_datetime, virtual: true
+    field :labels, :any, virtual: true
 
     has_many(:messages, Message)
     many_to_many(:from_addresses, Address, join_through: "conversation_from_address")
   end
 
-  def search("") do
-    select_conversations() |> Repo.all()
-  end
-
   def search(search_term) do
-    text_search(search_term)
+    query = Query.parse_query(search_term)
+    select_conversations()
+    |> text_search(query.text)
+    |> filter_labels(query.labels)
     |> Repo.all()
   end
 
@@ -28,16 +29,25 @@ defmodule Phail.Conversation do
     from c in Conversation,
       join: m in Message,
       on: c.id == m.conversation_id,
-      select: %{c | date: max(m.date)},
+      join: l in assoc(m, :labels),
+      select: %{c | date: max(m.date), labels: fragment("array_agg(distinct ?)", l.name) },
       group_by: c.id,
       order_by: [desc: max(m.date)],
       limit: 20,
       preload: [:from_addresses]
   end
 
-  defp text_search(search_term) do
-    select_conversations()
-    |> where([_c, m], fulltext(space_join(m.body, m.subject), ^search_term))
+  defp text_search(conversations, "") do
+    conversations
+  end
+
+  defp text_search(conversations, search_term) do
+    conversations |> where([_c, m], fulltext(space_join(m.body, m.subject), ^search_term))
+  end
+
+  defp filter_labels(conversations, labels) do
+    conversations
+    |> having([_c, _m, l], fragment("? <@ array_agg(?)", ^labels, l.name)) 
   end
 
   def get(id) do
@@ -47,7 +57,12 @@ defmodule Phail.Conversation do
       messages:
         from(m in Message,
           order_by: m.date,
-          preload: [:from_addresses, :to_addresses, :cc_addresses]
+          preload: [
+            :from_addresses,
+            :to_addresses,
+            :cc_addresses,
+            :labels
+          ]
         )
     )
   end

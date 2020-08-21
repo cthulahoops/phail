@@ -37,6 +37,24 @@ def insert_assoc(assoc_type, message_id, address_id):
     cursor = dbh.cursor()
     cursor.execute(sql, (message_id, address_id))
 
+def create_label(name):
+    cursor = dbh.cursor()
+    cursor.execute("insert into labels (name) values (%s) returning (id)", (name,))
+    return cursor.fetchone()[0]
+
+def get_label(name):
+    cursor = dbh.cursor()
+    cursor.execute("select id from labels where name = %s", (name,))
+    return cursor.fetchone() or create_label(name)
+
+def insert_label_assoc(message_id, label_name):
+    label_id = get_label(label_name)
+    cursor = dbh.cursor()
+    cursor.execute(
+        "insert into message_labels (message_id, label_id) values (%s, %s) on conflict do nothing",
+        (message_id, label_id))
+
+
 def insert_reference(message_id, reference):
     with dbh.cursor() as cursor:
         cursor.execute(
@@ -81,6 +99,9 @@ def get_conversation(message):
         or get_new_conversation(message))
 
 def insert_message(message):
+    if 'Chat' in message.labels:
+        return # Skip chats for now!
+
     from_addresses = list(map(get_address, message.addresses('from')))
     to_addresses = list(map(get_address, message.addresses('to')))
     cc_addresses = list(map(get_address, message.addresses('cc')))
@@ -105,6 +126,8 @@ def insert_message(message):
     for reference in message.references:
         insert_reference(message_id, reference)
 
+    for label in message.labels:
+        insert_label_assoc(message_id, label)
     dbh.commit()
 
     conversation_id = get_conversation(message)
@@ -114,6 +137,7 @@ def insert_message(message):
 
     for address_id in from_addresses:
         insert_conversation_from(conversation_id, address_id)
+
 
 
 def iter_dir_messages(directory_name):

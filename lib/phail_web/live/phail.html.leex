@@ -15,7 +15,11 @@
       <% end %>
       <% end %>
       </ul>
-      <span class=subject><%= conversation.subject %></span>
+      <span class=subject>
+        <%= for label <- conversation.labels do %>
+          <span class="message_label"><%= label %></span>
+        <% end %>
+        <%= conversation.subject %></span>
       <span class=date><%= conversation.date %></span>
     </div>
     <%= if conversation.id == @expanded_id do %>
@@ -45,6 +49,13 @@
         </li>
         <li>
         Date: <%= message.date %>
+        </li>
+
+        <li>
+          Labels:
+          <%= for label <- message.labels do %>
+            <span class="message_label"><%= label.name %></span>
+          <% end %>
         </li>
         </ul>
 

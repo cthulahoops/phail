@@ -77,6 +77,13 @@ class Message:
         return []
 
     @property
+    def labels(self):
+        labels = self.mail.get('X-Gmail-Labels')
+        if labels:
+            return labels.split(',')
+        return []
+
+    @property
     def references(self):
         references = self.mail.get("references")
         if references:

@@ -26,29 +26,14 @@ defmodule Phail.Address do
     )
   end
 
-  def display(%Address{address: address, name: name}) do
-    if name == "" do
-      address
-    else
-      name <> " <" <> address <> ">"
-    end
-  end
+  def display(%Address{address: address, name: ""}), do: address
+  def display(%Address{address: address, name: name}), do: name <> " <" <> address <> ">"
 
-  def display_name(%Address{address: address, name: name}) do
-    if name == "" do
-      address
-    else
-      name
-    end
-  end
+  def display_name(%Address{address: address, name: ""}), do: address
+  def display_name(%Address{name: name}), do: name
 
-  def display_short(%Address{address: address, name: name}) do
-    if name == "" do
-      address
-    else
-      hd(String.split(name, " "))
-    end
-  end
+  def display_short(%Address{address: address, name: ""}), do: address
+  def display_short(%Address{name: name}), do: hd(String.split(name, " "))
 
   def get_or_create(%{address: address, name: name}) do
     case Repo.get_by(Address, address: address, name: name) do

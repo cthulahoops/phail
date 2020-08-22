@@ -10,10 +10,21 @@ defmodule PhailWeb.Live.Phail do
   def mount(_params, _session, socket) do
     {:ok,
      socket
-     |> assign(:conversations, Conversation.search(""))
+     |> assign(:conversations, [])
      |> assign(:expanded_id, nil)
      |> assign(:expanded_conversation, nil)
      |> assign(:search_filter, "")}
+  end
+
+  def handle_params(%{"search_filter" => search_filter}, _uri, socket) do
+    {:noreply,
+      socket
+      |> assign(:search_filter, search_filter)
+      |> assign(:conversations, Conversation.search(search_filter))}
+  end
+
+  def handle_params(%{}, uri, socket) do
+    handle_params(%{"search_filter" => ""}, uri, socket)
   end
 
   def handle_event("update_filter", %{"filter" => filter}, socket) do

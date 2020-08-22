@@ -18,6 +18,7 @@ defmodule PhailWeb.Router do
     pipe_through :browser
 
     live "/", Live.Phail
+    live "/:search_filter/", Live.Phail
   end
 
   # Other scopes may use custom stacks.

@@ -3,6 +3,7 @@ defmodule Phail.Label do
 
   schema "labels" do
     field :name, :string
+
     many_to_many(
       :messages,
       Phail.Message,

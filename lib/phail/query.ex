@@ -6,7 +6,7 @@ defmodule Phail.Query do
     parts = Enum.map(parts, &parse_term/1)
     text_terms = for {:text, text} <- parts, do: text
     text = Enum.join(text_terms, " & ")
-    labels = for {:label, label_name} <- parts, do: label_name 
+    labels = for {:label, label_name} <- parts, do: label_name
 
     %Phail.Query{labels: labels, text: text}
   end

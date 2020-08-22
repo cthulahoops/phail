@@ -23,6 +23,7 @@ defmodule Phail.Conversation do
 
   def search(search_term) do
     query = Query.parse_query(search_term)
+
     select_conversations()
     |> text_search(query.text)
     |> filter_labels(query.labels)
@@ -34,7 +35,7 @@ defmodule Phail.Conversation do
       join: m in Message,
       on: c.id == m.conversation_id,
       join: l in assoc(m, :labels),
-      select: %{c | date: max(m.date), labels: fragment("array_agg(distinct ?)", l.name) },
+      select: %{c | date: max(m.date), labels: fragment("array_agg(distinct ?)", l.name)},
       group_by: c.id,
       order_by: [desc: max(m.date)],
       limit: 20,
@@ -51,7 +52,7 @@ defmodule Phail.Conversation do
 
   defp filter_labels(conversations, labels) do
     conversations
-    |> having([_c, _m, l], fragment("? <@ array_agg(lower(?))", ^labels, l.name)) 
+    |> having([_c, _m, l], fragment("? <@ array_agg(lower(?))", ^labels, l.name))
   end
 
   def get(id) do

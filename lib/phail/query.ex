@@ -14,7 +14,7 @@ defmodule Phail.Query do
   defp parse_term(term) do
     case String.split(term, ":", parts: 2) do
       [text] -> {:text, text}
-      ["label", label_name] -> {:label, label_name}
+      ["label", label_name] -> {:label, String.downcase(label_name)}
     end
   end
 end

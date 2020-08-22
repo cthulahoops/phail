@@ -18,9 +18,9 @@ defmodule PhailWeb.Live.Phail do
 
   def handle_params(%{"search_filter" => search_filter}, _uri, socket) do
     {:noreply,
-      socket
-      |> assign(:search_filter, search_filter)
-      |> assign(:conversations, Conversation.search(search_filter))}
+     socket
+     |> assign(:search_filter, search_filter)
+     |> assign(:conversations, Conversation.search(search_filter))}
   end
 
   def handle_params(%{}, uri, socket) do
@@ -31,6 +31,7 @@ defmodule PhailWeb.Live.Phail do
     socket
     |> assign(:conversations, Conversation.search(filter))
     |> assign(:search_filter, filter)
+    |> go_page
     |> noreply
   end
 
@@ -49,5 +50,11 @@ defmodule PhailWeb.Live.Phail do
       |> assign(:expanded_conversation, conversation)
     end
     |> noreply
+  end
+
+  defp go_page(socket) do
+    push_patch(socket,
+      to: PhailWeb.Router.Helpers.live_path(socket, __MODULE__, socket.assigns.search_filter)
+    )
   end
 end

@@ -1,5 +1,7 @@
 defmodule Phail.Label do
   use Ecto.Schema
+  alias Phail.Repo
+  alias __MODULE__
 
   schema "labels" do
     field :name, :string
@@ -9,5 +11,9 @@ defmodule Phail.Label do
       Phail.Message,
       join_through: "message_label"
     )
+
+    def all() do
+      Label |> Repo.all()
+    end
   end
 end

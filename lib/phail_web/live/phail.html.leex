@@ -1,3 +1,13 @@
+<ul class="label_list">
+  <%= for label <- @labels do %>
+    <li>
+      <%= live_patch to: PhailWeb.Router.Helpers.phail_path(@socket, :label, label.name) do %>
+      <%= label.name %>
+      <% end %>
+    </li>
+  <% end %>
+</ul>
+
 <form phx-submit="update_filter">
   <input name=filter placeholder="Search mail..." value="<%= @search_filter %>"</input>
 </form>

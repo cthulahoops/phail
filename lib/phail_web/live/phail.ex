@@ -7,20 +7,32 @@ defmodule PhailWeb.Live.Phail do
     {:noreply, socket}
   end
 
+  defp ok(socket) do
+    {:ok, socket}
+  end
+
   def mount(_params, _session, socket) do
-    {:ok,
-     socket
-     |> assign(:conversations, [])
-     |> assign(:expanded_id, nil)
-     |> assign(:expanded_conversation, nil)
-     |> assign(:search_filter, "")}
+    socket
+    |> assign(:conversations, [])
+    |> assign(:expanded_id, nil)
+    |> assign(:expanded_conversation, nil)
+    |> assign(:search_filter, "")
+    |> assign(:labels, Phail.Label.all())
+    |> ok
   end
 
   def handle_params(%{"search_filter" => search_filter}, _uri, socket) do
-    {:noreply,
-     socket
-     |> assign(:search_filter, search_filter)
-     |> assign(:conversations, Conversation.search(search_filter))}
+    socket
+    |> assign(:search_filter, search_filter)
+    |> assign(:conversations, Conversation.search(search_filter))
+    |> noreply
+  end
+
+  def handle_params(%{"label" => label}, _uri, socket) do
+    socket
+    |> assign(:search_filter, "")
+    |> assign(:conversations, Conversation.search("label:" <> label))
+    |> noreply
   end
 
   def handle_params(%{}, uri, socket) do
@@ -54,7 +66,7 @@ defmodule PhailWeb.Live.Phail do
 
   defp go_page(socket) do
     push_patch(socket,
-      to: PhailWeb.Router.Helpers.live_path(socket, __MODULE__, socket.assigns.search_filter)
+      to: PhailWeb.Router.Helpers.phail_path(socket, :search, socket.assigns.search_filter)
     )
   end
 end

@@ -17,6 +17,10 @@ defmodule Phail.Conversation do
     many_to_many(:from_addresses, Address, join_through: "conversation_from_address")
   end
 
+  def search("") do
+    search("label:inbox")
+  end
+
   def search(search_term) do
     query = Query.parse_query(search_term)
     select_conversations()

@@ -50,11 +50,11 @@ Current label: <%= @label %>
             phx-value-id="<%= conversation.id %>"
             phx-value-target="Archived">Archive</button>
         <% end %>
-        <%= if @label == 'Inbox' do %>
+        <%= if @label == "Inbox" do %>
           <button
             phx-click="move"
-            phx-value-id="<% conversation.id %>"
-            phx-value-target="ReplyLater">Reply Later</button>
+            phx-value-id="<%= conversation.id %>"
+            phx-value-target="Reply Later">Reply Later</button>
         <% end %>
         <button
           phx-click="move"

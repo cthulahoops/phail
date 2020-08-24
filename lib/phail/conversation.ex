@@ -28,6 +28,12 @@ defmodule Phail.Conversation do
     |> Repo.all()
   end
 
+  def select_by_label(label) do
+    select_conversations()
+    |> filter_labels([label])
+    |> Repo.all()
+  end
+
   defp select_conversations() do
     from c in Conversation,
       join: m in Message,

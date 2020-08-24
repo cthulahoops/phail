@@ -44,7 +44,7 @@ defmodule PhailWeb.Live.Phail do
   end
 
   defp get_conversations(%{:label => label}) when is_binary(label) do
-      Conversation.search("label:" <> label)
+      Conversation.select_by_label(label)
   end
 
   defp assign_conversations(socket) do

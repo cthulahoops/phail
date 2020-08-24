@@ -1,91 +1,100 @@
 Current label: <%= @label %>
 
-<ul class="label_list">
-  <%= for label <- @labels do %>
-    <li>
-      <%= live_patch to: PhailWeb.Router.Helpers.phail_path(@socket, :label, label.name) do %>
-      <%= label.name %>
+<div class="grid">
+<div class="header">
+  <form phx-submit="update_filter">
+    <input name=filter placeholder="Search mail..." value="<%= @search_filter %>"</input>
+  </form>
+</div>
+
+<div class="side">
+  <ul class="label_list">
+    <%= for label <- @labels do %>
+      <li>
+        <%= live_patch to: PhailWeb.Router.Helpers.phail_path(@socket, :label, label.name) do %>
+        <%= label.name %>
+        <% end %>
+      </li>
+    <% end %>
+  </ul>
+</div>
+
+<div class="main">
+
+  <ul class=mailbox>
+  <%= for conversation <- @conversations do %>
+    <li class="conversation">
+      <div class="conversation_header" phx-value-id="<%= conversation.id %>" phx-click="expand">
+        <ul class="from">
+        <%= if length(conversation.from_addresses) == 1 do %>
+          <li><%= Phail.Address.display_name hd(conversation.from_addresses) %></li>
+        <% else %>
+        <%= for address <- conversation.from_addresses do %>
+          <li><%= Phail.Address.display_short address %></li>
+        <% end %>
+        <% end %>
+        </ul>
+        <span class=subject>
+          <%= for label <- conversation.labels do %>
+            <span class="message_label"><%= label %></span>
+          <% end %>
+          <%= conversation.subject %></span>
+        <span class=date><%= conversation.date %></span>
+      </div>
+      <%= if conversation.id == @expanded_id do %>
+
+      <div class="conversation_buttons">
+        <%= if @label != 'Inbox' do %>
+        <button phx-click="move" phx-value-id="<%= conversation.id %>" phx-value-target="Archived">Archive</button>
+        <% end %>
+        <button phx-click="move" phx-value-id="<%= conversation.id %>" phx-value-target="Spam">Spam</button>
+        <button phx-click="move" phx-value-id="<%= conversation.id %>" phx-value-target="Bin">Delete</button>
+      </div>
+      <div class="conversation_contents">
+        <%= for message <- @expanded_conversation.messages do %>
+        <div class=message>
+          <ul>
+          <li>
+          From:
+          <%= for address <- message.from_addresses do %>
+             <span class=address title="<%= address.address %>"><%= Phail.Address.display address %></span>
+          <% end %>
+          </li>
+          <li>
+          To:
+          <%= for address <- message.to_addresses do %>
+             <span class=address title="<%= address.address %>"><%= Phail.Address.display address %></span>
+          <% end %>
+          </li>
+          <%= if message.cc_addresses != [] do %>
+          <li>
+          Cc:
+          <%= for address <- message.cc_addresses do %>
+             <span class=address title="<%= address.address %>"><%= Phail.Address.display address %></span>
+          <% end %>
+          <% end %>
+          </li>
+          <li>
+          Date: <%= message.date %>
+          </li>
+
+          <li>
+            Labels:
+            <%= for label <- message.labels do %>
+              <span class="message_label"><%= label.name %></span>
+            <% end %>
+          </li>
+          </ul>
+
+          <div class=body>
+          <%= Phoenix.HTML.raw message.body %>
+          </div>
+        </div>
+        <% end %>
+      </div>
       <% end %>
     </li>
   <% end %>
-</ul>
-
-<form phx-submit="update_filter">
-  <input name=filter placeholder="Search mail..." value="<%= @search_filter %>"</input>
-</form>
-
-<ul class=mailbox>
-<%= for conversation <- @conversations do %>
-  <li class="conversation">
-    <div class="conversation_header" phx-value-id="<%= conversation.id %>" phx-click="expand">
-      <ul class="from">
-      <%= if length(conversation.from_addresses) == 1 do %>
-        <li><%= Phail.Address.display_name hd(conversation.from_addresses) %></li>
-      <% else %>
-      <%= for address <- conversation.from_addresses do %>
-        <li><%= Phail.Address.display_short address %></li>
-      <% end %>
-      <% end %>
-      </ul>
-      <span class=subject>
-        <%= for label <- conversation.labels do %>
-          <span class="message_label"><%= label %></span>
-        <% end %>
-        <%= conversation.subject %></span>
-      <span class=date><%= conversation.date %></span>
-    </div>
-    <%= if conversation.id == @expanded_id do %>
-
-    <div class="conversation_buttons">
-      <%= if @label != 'Inbox' do %>
-      <button phx-click="move" phx-value-id="<%= conversation.id %>" phx-value-target="Archived">Archive</button>
-      <% end %>
-      <button phx-click="move" phx-value-id="<%= conversation.id %>" phx-value-target="Spam">Spam</button>
-      <button phx-click="move" phx-value-id="<%= conversation.id %>" phx-value-target="Bin">Delete</button>
-    </div>
-    <div class="conversation_contents">
-      <%= for message <- @expanded_conversation.messages do %>
-      <div class=message>
-        <ul>
-        <li>
-        From:
-        <%= for address <- message.from_addresses do %>
-           <span class=address title="<%= address.address %>"><%= Phail.Address.display address %></span>
-        <% end %>
-        </li>
-        <li>
-        To:
-        <%= for address <- message.to_addresses do %>
-           <span class=address title="<%= address.address %>"><%= Phail.Address.display address %></span>
-        <% end %>
-        </li>
-        <%= if message.cc_addresses != [] do %>
-        <li>
-        Cc:
-        <%= for address <- message.cc_addresses do %>
-           <span class=address title="<%= address.address %>"><%= Phail.Address.display address %></span>
-        <% end %>
-        <% end %>
-        </li>
-        <li>
-        Date: <%= message.date %>
-        </li>
-
-        <li>
-          Labels:
-          <%= for label <- message.labels do %>
-            <span class="message_label"><%= label.name %></span>
-          <% end %>
-        </li>
-        </ul>
-
-        <div class=body>
-        <%= Phoenix.HTML.raw message.body %>
-        </div>
-      </div>
-      <% end %>
-    </div>
-    <% end %>
-  </li>
-<% end %>
-</ul>
+  </ul>
+  </div>
+</div>

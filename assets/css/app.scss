@@ -96,7 +96,6 @@ body {
 
 .mailbox {
   list-style: none;
-  width: 80%;
 }
 
 .conversation ul.from {
@@ -151,4 +150,24 @@ span.message_label {
   border: 1px solid black;
   border-radius: 0.5em;
   background-color: #ffffaa;
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: 20% 80%;
+  grid-template-areas:
+    "head head"
+    "side main";
+}
+
+.header {
+  grid-area: head;
+}
+
+.side {
+  grid-area: side;
+}
+
+.main {
+  grid-area: main;
 }

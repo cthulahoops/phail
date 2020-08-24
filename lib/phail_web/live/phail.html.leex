@@ -45,10 +45,31 @@ Current label: <%= @label %>
 
       <div class="conversation_buttons">
         <%= if @label != 'Inbox' do %>
-        <button phx-click="move" phx-value-id="<%= conversation.id %>" phx-value-target="Archived">Archive</button>
+          <button
+            phx-click="move"
+            phx-value-id="<%= conversation.id %>"
+            phx-value-target="Archived">Archive</button>
         <% end %>
-        <button phx-click="move" phx-value-id="<%= conversation.id %>" phx-value-target="Spam">Spam</button>
-        <button phx-click="move" phx-value-id="<%= conversation.id %>" phx-value-target="Bin">Delete</button>
+        <%= if @label == 'Inbox' do %>
+          <button
+            phx-click="move"
+            phx-value-id="<% conversation.id %>"
+            phx-value-target="ReplyLater">Reply Later</button>
+        <% end %>
+        <button
+          phx-click="move"
+          phx-value-id="<%= conversation.id %>"
+          phx-value-target="Spam">Spam</button>
+        <button
+          phx-click="move"
+          phx-value-id="<%= conversation.id %>"
+          phx-value-target="Bin">Delete</button>
+        <%= if @label != 'Inbox' do %>
+        <button
+          phx-click="move"
+          phx-value-id="<%= conversation.id %>"
+          phx-value-target="Inbox">Move to Inbox</button>
+        <% end %>
       </div>
       <div class="conversation_contents">
         <%= for message <- @expanded_conversation.messages do %>

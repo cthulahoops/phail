@@ -41,7 +41,7 @@ Current label: <%= @label %>
           <%= conversation.subject %></span>
         <span class=date><%= conversation.date %></span>
       </div>
-      <%= if conversation.id == @expanded_id do %>
+      <%= if !is_nil(@expanded) && conversation.id == @expanded.id do %>
 
       <div class="conversation_buttons">
         <%= if @label != 'Inbox' do %>
@@ -72,7 +72,7 @@ Current label: <%= @label %>
         <% end %>
       </div>
       <div class="conversation_contents">
-        <%= for message <- @expanded_conversation.messages do %>
+        <%= for message <- @expanded.messages do %>
         <div class=message>
           <ul>
           <li>

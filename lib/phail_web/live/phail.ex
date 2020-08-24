@@ -14,8 +14,7 @@ defmodule PhailWeb.Live.Phail do
 
   def mount(_params, _session, socket) do
     socket
-    |> assign(:expanded_id, nil)
-    |> assign(:expanded_conversation, nil)
+    |> assign(:expanded, nil)
     |> assign(:labels, Label.all())
     |> ok
   end
@@ -63,17 +62,11 @@ defmodule PhailWeb.Live.Phail do
 
   def handle_event("expand", %{"id" => conversation_id}, socket) do
     conversation_id = String.to_integer(conversation_id)
-
-    if conversation_id == socket.assigns.expanded_id do
-      socket
-      |> assign(:expanded_id, nil)
-      |> assign(:expanded_conversation, nil)
+  
+    if is_expanded(conversation_id, socket.assigns.expanded) do
+      socket |> assign(:expanded, nil)
     else
-      conversation = Conversation.get(conversation_id)
-
-      socket
-      |> assign(:expanded_id, conversation.id)
-      |> assign(:expanded_conversation, conversation)
+      socket |> assign(:expanded, Conversation.get(conversation_id))
     end
     |> noreply
   end
@@ -99,5 +92,10 @@ defmodule PhailWeb.Live.Phail do
     push_patch(socket,
       to: PhailWeb.Router.Helpers.phail_path(socket, :search, socket.assigns.search_filter)
     )
+  end
+
+  def is_expanded(_conversation_id, nil), do: false
+  def is_expanded(conversation_id, conversation) do
+    conversation_id == conversation.id
   end
 end

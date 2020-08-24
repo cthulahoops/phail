@@ -1,6 +1,6 @@
 defmodule Phail.Message do
   import Ecto.Query
-
+  alias Ecto.Changeset
   use Ecto.Schema
   alias Phail.Message
   alias Phail.Repo
@@ -35,7 +35,8 @@ defmodule Phail.Message do
     many_to_many(
       :labels,
       Label,
-      join_through: "message_labels"
+      join_through: "message_labels",
+      on_replace: :delete
     )
   end
 
@@ -84,11 +85,18 @@ defmodule Phail.Message do
     |> Repo.preload([
       :from_addresses,
       :to_addresses,
-      :cc_addresses
+      :cc_addresses,
+      :labels
     ])
   end
 
   def all() do
     Message |> Repo.all() |> Repo.preload([:from_addresses, :to_addresses, :cc_addresses])
+  end
+
+  def add_label(message, label) do
+    Changeset.change(message)
+    |> Changeset.put_assoc(:labels, [label|message.labels])
+    |> Repo.update!
   end
 end

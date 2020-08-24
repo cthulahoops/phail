@@ -1,3 +1,5 @@
+Current label: <%= @label %>
+
 <ul class="label_list">
   <%= for label <- @labels do %>
     <li>
@@ -33,6 +35,14 @@
       <span class=date><%= conversation.date %></span>
     </div>
     <%= if conversation.id == @expanded_id do %>
+
+    <div class="conversation_buttons">
+      <%= if @label != 'Inbox' do %>
+      <button phx-click="move" phx-value-id="<%= conversation.id %>" phx-value-target="Archived">Archive</button>
+      <% end %>
+      <button phx-click="move" phx-value-id="<%= conversation.id %>" phx-value-target="Spam">Spam</button>
+      <button phx-click="move" phx-value-id="<%= conversation.id %>" phx-value-target="Bin">Delete</button>
+    </div>
     <div class="conversation_contents">
       <%= for message <- @expanded_conversation.messages do %>
       <div class=message>

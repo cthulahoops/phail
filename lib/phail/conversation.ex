@@ -2,9 +2,7 @@ defmodule Phail.Conversation do
   import Ecto.Query
   import Phail.TextSearch
   use Ecto.Schema
-  alias Phail.Address
-  alias Phail.Message
-  alias Phail.Conversation
+  alias Phail.{Conversation, Message, Label, Address}
   alias Phail.Repo
   alias Phail.Query
 
@@ -53,6 +51,23 @@ defmodule Phail.Conversation do
   defp filter_labels(conversations, labels) do
     conversations
     |> having([_c, _m, l], fragment("? <@ array_agg(?)", ^labels, l.name))
+  end
+
+  def add_label(conversation, label_name) do
+    label = Label.get_or_create(label_name)
+    Enum.each(conversation.messages, fn(message) -> Message.add_label(message, label) end)
+  end
+
+  def remove_label(conversation, label_name) do
+    from(j in "message_labels",
+      join: m in Message,
+      on: m.id == j.message_id,
+      join: l in Label,
+      on: l.id == j.label_id,
+      where: m.conversation_id == ^conversation.id,
+      where: l.name == ^label_name
+    )
+    |> Repo.delete_all()
   end
 
   def get(id) do

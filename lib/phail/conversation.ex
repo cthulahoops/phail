@@ -58,13 +58,13 @@ defmodule Phail.Conversation do
     Enum.each(conversation.messages, fn(message) -> Message.add_label(message, label) end)
   end
 
-  def remove_label(conversation, label_name) do
+  def remove_label(conversation_id, label_name) do
     from(j in "message_labels",
       join: m in Message,
       on: m.id == j.message_id,
       join: l in Label,
       on: l.id == j.label_id,
-      where: m.conversation_id == ^conversation.id,
+      where: m.conversation_id == ^conversation_id,
       where: l.name == ^label_name
     )
     |> Repo.delete_all()

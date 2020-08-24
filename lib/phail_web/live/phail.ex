@@ -87,11 +87,11 @@ defmodule PhailWeb.Live.Phail do
 
   defp change_labels(conversation_id, old_label, new_label) do
     conversation_id = String.to_integer(conversation_id)
-    conversation = Conversation.get(conversation_id)
 
     if old_label != :nil do
-      Conversation.remove_label(conversation, old_label)
+      Conversation.remove_label(conversation_id, old_label)
     end
+    conversation = Conversation.get(conversation_id)
     Conversation.add_label(conversation, new_label)
   end
 

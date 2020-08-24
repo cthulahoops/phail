@@ -52,7 +52,7 @@ defmodule Phail.Conversation do
 
   defp filter_labels(conversations, labels) do
     conversations
-    |> having([_c, _m, l], fragment("? <@ array_agg(lower(?))", ^labels, l.name))
+    |> having([_c, _m, l], fragment("? <@ array_agg(?)", ^labels, l.name))
   end
 
   def get(id) do

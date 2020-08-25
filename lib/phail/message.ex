@@ -40,7 +40,7 @@ defmodule Phail.Message do
     )
   end
 
-  def create(from, to, cc, subject, body) do
+  def create(conversation, from, to, cc, subject, body, labels) do
     from = Enum.map(from, &Address.get_or_create/1)
     to = Enum.map(to, &Address.get_or_create/1)
     cc = Enum.map(cc, &Address.get_or_create/1)
@@ -50,13 +50,29 @@ defmodule Phail.Message do
       body: body,
       to_addresses: [],
       from_addresses: [],
-      cc_addresses: []
+      cc_addresses: [],
+      labels: [],
+      conversation: conversation
     }
     |> Repo.insert!()
-    |> Ecto.Changeset.change()
-    |> Ecto.Changeset.put_assoc(:from_addresses, from)
-    |> Ecto.Changeset.put_assoc(:to_addresses, to)
-    |> Ecto.Changeset.put_assoc(:cc_addresses, cc)
+    |> Changeset.change()
+    |> Changeset.put_assoc(:from_addresses, from)
+    |> Changeset.put_assoc(:to_addresses, to)
+    |> Changeset.put_assoc(:cc_addresses, cc)
+    |> Changeset.put_assoc(:labels, labels)
+    |> Repo.update!()
+  end
+
+  def create_draft(from, to, cc, subject, body) do
+    conversation = Conversation.create("Draft Message")
+    label = Label.get_or_create("Drafts")
+    create(conversation, from, to, cc, subject, body, [label])
+  end
+
+  def update_draft(message, mail_data \\ %{}) do
+    message
+    |> Changeset.change()
+    |> Changeset.cast(mail_data, [:subject, :body])
     |> Repo.update!()
   end
 

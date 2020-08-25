@@ -15,6 +15,13 @@ defmodule Phail.Conversation do
     many_to_many(:from_addresses, Address, join_through: "conversation_from_address")
   end
 
+  def create(subject) do
+    %Conversation{
+      subject: subject
+    }
+    |> Repo.insert!()
+  end
+
   def search("") do
     search("label:inbox")
   end
@@ -92,4 +99,5 @@ defmodule Phail.Conversation do
         )
     )
   end
+
 end

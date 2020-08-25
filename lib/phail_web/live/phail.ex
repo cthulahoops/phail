@@ -75,6 +75,7 @@ defmodule PhailWeb.Live.Phail do
     change_labels(conversation_id, socket.assigns.label, target)
     socket
     |> assign_conversations
+    |> assign(:expanded, nil)
     |> noreply
   end
 

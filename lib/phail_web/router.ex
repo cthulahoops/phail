@@ -20,6 +20,8 @@ defmodule PhailWeb.Router do
     live "/", Live.Phail
     live "/search/:search_filter/", Live.Phail, :search
     live "/label/:label/", Live.Phail, :label
+
+    live "/compose/", Live.Compose
   end
 
   # Other scopes may use custom stacks.

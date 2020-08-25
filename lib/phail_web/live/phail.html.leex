@@ -5,6 +5,8 @@ Current label: <%= @label %>
   <form phx-submit="update_filter">
     <input name=filter placeholder="Search mail..." value="<%= @search_filter %>"</input>
   </form>
+
+  <%= Phoenix.HTML.Link.link "Compose", to: PhailWeb.Router.Helpers.live_path(@socket, PhailWeb.Live.Compose), class: "button" %>
 </div>
 
 <div class="side">
@@ -64,7 +66,7 @@ Current label: <%= @label %>
           phx-click="move"
           phx-value-id="<%= conversation.id %>"
           phx-value-target="Bin">Delete</button>
-        <%= if @label != 'Inbox' do %>
+        <%= if @label != "Inbox" do %>
         <button
           phx-click="move"
           phx-value-id="<%= conversation.id %>"

@@ -72,6 +72,10 @@ defmodule Phail.Message do
     conversation = Conversation.create("Draft Message")
     create(conversation, from, to, cc, subject, body, [], is_draft: true)
   end
+
+  def delete(message) do
+    message
+    |> Repo.delete!()
   end
 
   def update_draft(message, mail_data \\ %{}) do

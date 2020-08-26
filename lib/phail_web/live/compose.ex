@@ -20,6 +20,10 @@ defmodule PhailWeb.Live.Compose do
     message = save_message(mail_data, socket.assigns.message)
     socket
     |> assign(:message, message)
+  def handle_event("discard_and_close", _mail_data, socket) do
+    Message.delete(socket.assigns.message)
+    socket
+    |> close
     |> noreply
   end
 

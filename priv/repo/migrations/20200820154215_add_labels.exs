@@ -7,7 +7,7 @@ defmodule Phail.Repo.Migrations.AddLabels do
     end
 
     create table(:message_labels, primary_key: false) do
-      add :message_id, references(:messages)
+      add :message_id, references(:messages, on_delete: :delete_all)
       add :label_id, references(:labels)
     end
 

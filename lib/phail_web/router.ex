@@ -22,6 +22,7 @@ defmodule PhailWeb.Router do
     live "/label/:label/", Live.Phail, :label
 
     live "/compose/", Live.Compose
+    live "/compose/:message_id/", Live.Compose, :message_id
   end
 
   # Other scopes may use custom stacks.

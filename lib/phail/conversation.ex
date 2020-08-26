@@ -79,7 +79,7 @@ defmodule Phail.Conversation do
 
   def add_label(conversation, label_name) do
     label = Label.get_or_create(label_name)
-    Enum.each(conversation.messages, fn(message) -> Message.add_label(message, label) end)
+    Enum.each(conversation.messages, fn message -> Message.add_label(message, label) end)
   end
 
   def remove_label(conversation_id, label_name) do
@@ -110,5 +110,4 @@ defmodule Phail.Conversation do
         )
     )
   end
-
 end

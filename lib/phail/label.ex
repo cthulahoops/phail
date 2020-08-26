@@ -19,6 +19,7 @@ defmodule Phail.Label do
 
   def get_or_create(label_name) do
     {:ok, label} = %Label{name: label_name} |> Repo.insert(on_conflict: :nothing)
+
     if is_nil(label.id) do
       Repo.get_by(Label, name: label_name)
     else

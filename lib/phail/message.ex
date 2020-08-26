@@ -121,7 +121,7 @@ defmodule Phail.Message do
 
   def add_label(message, label) do
     Changeset.change(message)
-    |> Changeset.put_assoc(:labels, [label|message.labels])
-    |> Repo.update!
+    |> Changeset.put_assoc(:labels, [label | message.labels])
+    |> Repo.update!()
   end
 end

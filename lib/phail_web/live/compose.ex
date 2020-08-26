@@ -18,7 +18,7 @@ defmodule PhailWeb.Live.Compose do
 
   def mount(%{}, _session, socket) do
     socket
-    |> assign(:message, %{:subject => "", :body => "", :id => :nil})
+    |> assign(:message, %{:subject => "", :body => "", :id => nil})
     |> ok
   end
 
@@ -36,6 +36,7 @@ defmodule PhailWeb.Live.Compose do
 
   def handle_event("discard_and_close", _mail_data, socket) do
     Message.delete(socket.assigns.message)
+
     socket
     |> close
     |> noreply
@@ -54,16 +55,15 @@ defmodule PhailWeb.Live.Compose do
 
   defp save_message(socket, %{"subject" => subject, "body" => body}) do
     message = socket.assigns.message
+
     if is_nil(message.id) do
       message = Message.create_draft([], [], [], subject, body)
+
       assign(socket, :message, message)
-      |> push_patch(
-        to: PhailWeb.Router.Helpers.compose_path(socket, :message_id, message.id)
-      )
+      |> push_patch(to: PhailWeb.Router.Helpers.compose_path(socket, :message_id, message.id))
     else
       message = Message.update_draft(message, %{"subject" => subject, "body" => body})
       assign(socket, :message, message)
     end
   end
-
 end

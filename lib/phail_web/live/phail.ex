@@ -40,15 +40,15 @@ defmodule PhailWeb.Live.Phail do
   end
 
   defp get_conversations(%{:label => nil, :search_filter => search_filter}) do
-      Conversation.search(search_filter)
+    Conversation.search(search_filter)
   end
 
   defp get_conversations(%{:label => "Drafts"}) do
-      Conversation.select_drafts()
+    Conversation.select_drafts()
   end
 
   defp get_conversations(%{:label => label}) when is_binary(label) do
-      Conversation.select_by_label(label)
+    Conversation.select_by_label(label)
   end
 
   defp assign_conversations(socket) do
@@ -58,7 +58,7 @@ defmodule PhailWeb.Live.Phail do
   def handle_event("update_filter", %{"filter" => filter}, socket) do
     socket
     |> assign(:search_filter, filter)
-    |> assign(:label, :nil)
+    |> assign(:label, nil)
     |> assign_conversations
     |> go_page
     |> noreply
@@ -66,7 +66,7 @@ defmodule PhailWeb.Live.Phail do
 
   def handle_event("expand", %{"id" => conversation_id}, socket) do
     conversation_id = String.to_integer(conversation_id)
-  
+
     if is_expanded(conversation_id, socket.assigns.expanded) do
       socket |> assign(:expanded, nil)
     else
@@ -77,6 +77,7 @@ defmodule PhailWeb.Live.Phail do
 
   def handle_event("move", %{"id" => conversation_id, "target" => target}, socket) do
     change_labels(conversation_id, socket.assigns.label, target)
+
     socket
     |> assign_conversations
     |> assign(:expanded, nil)
@@ -86,9 +87,10 @@ defmodule PhailWeb.Live.Phail do
   defp change_labels(conversation_id, old_label, new_label) do
     conversation_id = String.to_integer(conversation_id)
 
-    if old_label != :nil do
+    if old_label != nil do
       Conversation.remove_label(conversation_id, old_label)
     end
+
     conversation = Conversation.get(conversation_id)
     Conversation.add_label(conversation, new_label)
   end
@@ -100,6 +102,7 @@ defmodule PhailWeb.Live.Phail do
   end
 
   def is_expanded(_conversation_id, nil), do: false
+
   def is_expanded(conversation_id, conversation) do
     conversation_id == conversation.id
   end

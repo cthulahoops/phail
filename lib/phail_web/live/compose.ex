@@ -10,21 +10,16 @@ defmodule PhailWeb.Live.Compose do
     {:ok, socket}
   end
 
-  def mount(_params, _session, socket) do
+  def mount(%{"message_id" => message_id}, _session, socket) do
     socket
+    |> assign(:message, Message.get(message_id))
     |> ok
   end
 
-  def handle_params(%{"message_id" => message_id}, _uri, socket) do
+  def mount(%{}, _session, socket) do
     socket
-    |> assign(:message, Message.get(message_id))
-    |> noreply
-  end
-
-  def handle_params(%{}, _uri, socket) do
-    socket 
     |> assign(:message, %{:subject => "", :body => "", :id => :nil})
-    |> noreply
+    |> ok
   end
 
   def handle_event("save_draft", mail_data, socket) do

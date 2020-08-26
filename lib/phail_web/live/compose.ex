@@ -22,6 +22,11 @@ defmodule PhailWeb.Live.Compose do
     |> ok
   end
 
+  def handle_params(_params, _session, socket) do
+    # Everything should have been set-up for us already?
+    noreply(socket)
+  end
+
   def handle_event("save_draft", mail_data, socket) do
     socket
     |> save_message(mail_data)

@@ -34,12 +34,9 @@ defmodule PhailWeb.Live.Compose do
     |> noreply
   end
 
-  def handle_event("discard_and_close", _mail_data, socket) do
+  def handle_event("discard_and_close", mail_data, socket) do
     Message.delete(socket.assigns.message)
-
-    socket
-    |> close
-    |> noreply
+    handle_event("close", mail_data, socket)
   end
 
   defp close(socket) do

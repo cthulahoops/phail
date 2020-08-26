@@ -40,7 +40,9 @@ defmodule PhailWeb.Live.Compose do
   end
 
   def handle_event("discard_and_close", mail_data, socket) do
-    Message.delete(socket.assigns.message)
+    if !is_nil(socket.assigns.message.id) do
+      Message.delete(socket.assigns.message)
+    end
     handle_event("close", mail_data, socket)
   end
 

@@ -12,6 +12,7 @@ defmodule Phail.Message do
     field(:subject, :string)
     field(:body, :string)
     field(:date, :utc_datetime)
+    field(:is_draft, :boolean)
     belongs_to(:conversation, Conversation)
 
     many_to_many(
@@ -36,11 +37,14 @@ defmodule Phail.Message do
       :labels,
       Label,
       join_through: "message_labels",
-      on_replace: :delete
+      on_replace: :delete,
+      on_delete: :delete_all
     )
   end
 
-  def create(conversation, from, to, cc, subject, body, labels) do
+  def create(conversation, from, to, cc, subject, body, labels, options \\ []) do
+    is_draft = Keyword.get(options, :is_draft, false)
+
     from = Enum.map(from, &Address.get_or_create/1)
     to = Enum.map(to, &Address.get_or_create/1)
     cc = Enum.map(cc, &Address.get_or_create/1)
@@ -48,6 +52,7 @@ defmodule Phail.Message do
     %Message{
       subject: subject,
       body: body,
+      is_draft: is_draft,
       to_addresses: [],
       from_addresses: [],
       cc_addresses: [],
@@ -65,8 +70,8 @@ defmodule Phail.Message do
 
   def create_draft(from, to, cc, subject, body) do
     conversation = Conversation.create("Draft Message")
-    label = Label.get_or_create("Drafts")
-    create(conversation, from, to, cc, subject, body, [label])
+    create(conversation, from, to, cc, subject, body, [], is_draft: true)
+  end
   end
 
   def update_draft(message, mail_data \\ %{}) do

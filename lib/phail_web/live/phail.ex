@@ -43,6 +43,10 @@ defmodule PhailWeb.Live.Phail do
       Conversation.search(search_filter)
   end
 
+  defp get_conversations(%{:label => "Drafts"}) do
+      Conversation.select_drafts()
+  end
+
   defp get_conversations(%{:label => label}) when is_binary(label) do
       Conversation.select_by_label(label)
   end

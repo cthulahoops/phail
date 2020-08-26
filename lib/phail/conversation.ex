@@ -41,6 +41,12 @@ defmodule Phail.Conversation do
     |> Repo.all()
   end
 
+  def select_drafts() do
+    select_conversations()
+    |> filter_drafts
+    |> Repo.all()
+  end
+
   defp select_conversations() do
     from c in Conversation,
       join: m in Message,
@@ -64,6 +70,11 @@ defmodule Phail.Conversation do
   defp filter_labels(conversations, labels) do
     conversations
     |> having([_c, _m, l], fragment("? <@ array_agg(?)", ^labels, l.name))
+  end
+
+  defp filter_drafts(conversations) do
+    conversations
+    |> where([_c, m, _l], m.is_draft)
   end
 
   def add_label(conversation, label_name) do

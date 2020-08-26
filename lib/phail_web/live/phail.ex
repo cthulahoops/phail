@@ -1,7 +1,6 @@
 defmodule PhailWeb.Live.Phail do
   use PhailWeb, :live_view
-  alias Phail.Conversation
-  alias Phail.Label
+  alias Phail.{Conversation, Message, Label}
 
   defp noreply(socket) do
     {:noreply, socket}
@@ -78,8 +77,17 @@ defmodule PhailWeb.Live.Phail do
     change_labels(conversation_id, socket.assigns.label, target)
 
     socket
-    |> assign_conversations
     |> assign(:expanded, nil)
+    |> assign_conversations
+    |> noreply
+  end
+
+  def handle_event("discard", %{"message_id" => message_id}, socket) do
+    Message.get(String.to_integer(message_id)) |> Message.delete
+
+    socket
+    |> assign(:expanded, nil)
+    |> assign_conversations
     |> noreply
   end
 

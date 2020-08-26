@@ -113,7 +113,7 @@ Current label: <%= @label %>
           </ul>
 
           <%= link "Edit", to: Routes.compose_path(@socket, :message_id, message.id), class: "button" %>
-
+          <button phx-click="discard" phx-event="discard" phx-value-message_id="<%= message.id %>">Discard</button>
           <div class=body>
           <%= raw message.body %>
           </div>

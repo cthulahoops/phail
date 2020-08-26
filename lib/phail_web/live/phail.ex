@@ -1,8 +1,7 @@
 defmodule PhailWeb.Live.Phail do
-  # alias Phail.Message
+  use PhailWeb, :live_view
   alias Phail.Conversation
   alias Phail.Label
-  use Phoenix.LiveView
 
   defp noreply(socket) do
     {:noreply, socket}
@@ -97,7 +96,7 @@ defmodule PhailWeb.Live.Phail do
 
   defp go_page(socket) do
     push_patch(socket,
-      to: PhailWeb.Router.Helpers.phail_path(socket, :search, socket.assigns.search_filter)
+      to: Routes.phail_path(socket, :search, socket.assigns.search_filter)
     )
   end
 

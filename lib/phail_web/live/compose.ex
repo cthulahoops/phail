@@ -1,5 +1,5 @@
 defmodule PhailWeb.Live.Compose do
-  use Phoenix.LiveView
+  use PhailWeb, :live_view
   alias Phail.Message
 
   defp noreply(socket) do
@@ -46,7 +46,7 @@ defmodule PhailWeb.Live.Compose do
 
   defp close(socket) do
     push_redirect(socket,
-      to: PhailWeb.Router.Helpers.phail_path(socket, :label, "Inbox")
+      to: Routes.phail_path(socket, :label, "Inbox")
     )
   end
 
@@ -62,7 +62,7 @@ defmodule PhailWeb.Live.Compose do
       message = Message.create_draft([], [], [], subject, body)
 
       assign(socket, :message, message)
-      |> push_patch(to: PhailWeb.Router.Helpers.compose_path(socket, :message_id, message.id))
+      |> push_patch(to: Routes.compose_path(socket, :message_id, message.id))
     else
       message = Message.update_draft(message, %{"subject" => subject, "body" => body})
       assign(socket, :message, message)

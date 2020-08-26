@@ -6,14 +6,14 @@ Current label: <%= @label %>
     <input name=filter placeholder="Search mail..." value="<%= @search_filter %>"</input>
   </form>
 
-  <%= Phoenix.HTML.Link.link "Compose", to: PhailWeb.Router.Helpers.live_path(@socket, PhailWeb.Live.Compose), class: "button" %>
+  <%= Phoenix.HTML.Link.link "Compose", to: Routes.live_path(@socket, PhailWeb.Live.Compose), class: "button" %>
 </div>
 
 <div class="side">
   <ul class="label_list">
     <%= for label <- @labels do %>
       <li>
-        <%= live_patch to: PhailWeb.Router.Helpers.phail_path(@socket, :label, label.name) do %>
+        <%= live_patch to: Routes.phail_path(@socket, :label, label.name) do %>
         <%= label.name %>
         <% end %>
       </li>
@@ -112,7 +112,7 @@ Current label: <%= @label %>
           </li>
           </ul>
 
-          <%= Phoenix.HTML.Link.link "Edit", to: PhailWeb.Router.Helpers.compose_path(@socket, :message_id, message.id), class: "button" %>
+          <%= Phoenix.HTML.Link.link "Edit", to: Routes.compose_path(@socket, :message_id, message.id), class: "button" %>
 
           <div class=body>
           <%= Phoenix.HTML.raw message.body %>

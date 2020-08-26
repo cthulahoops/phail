@@ -12,14 +12,33 @@ defmodule PhailWeb.Live.Compose do
 
   def mount(_params, _session, socket) do
     socket
-    |> assign(:message, :nil)
     |> ok
   end
 
-  def handle_event("save_draft", mail_data, socket) do
-    message = save_message(mail_data, socket.assigns.message)
+  def handle_params(%{"message_id" => message_id}, _uri, socket) do
     socket
-    |> assign(:message, message)
+    |> assign(:message, Message.get(message_id))
+    |> noreply
+  end
+
+  def handle_params(%{}, _uri, socket) do
+    socket 
+    |> assign(:message, %{:subject => "", :body => "", :id => :nil})
+    |> noreply
+  end
+
+  def handle_event("save_draft", mail_data, socket) do
+    socket
+    |> save_message(mail_data)
+    |> noreply
+  end
+
+  def handle_event("close", _mail_data, socket) do
+    socket
+    |> close
+    |> noreply
+  end
+
   def handle_event("discard_and_close", _mail_data, socket) do
     Message.delete(socket.assigns.message)
     socket
@@ -27,12 +46,10 @@ defmodule PhailWeb.Live.Compose do
     |> noreply
   end
 
-  def handle_event("submit", mail_data, socket) do
-    save_message(mail_data, socket.assigns.message)
+  defp close(socket) do
     push_redirect(socket,
       to: PhailWeb.Router.Helpers.phail_path(socket, :label, "Inbox")
     )
-    |> noreply
   end
 
   # def handle_event("send", _mail_data, socket) do
@@ -40,11 +57,17 @@ defmodule PhailWeb.Live.Compose do
   #   |> noreply
   # end
 
-  defp save_message(%{"subject" => subject, "body" => body}, message) do
-    if is_nil(message) do
-      Message.create_draft([], [], [], subject, body)
+  defp save_message(socket, %{"subject" => subject, "body" => body}) do
+    message = socket.assigns.message
+    if is_nil(message.id) do
+      message = Message.create_draft([], [], [], subject, body)
+      assign(socket, :message, message)
+      |> push_patch(
+        to: PhailWeb.Router.Helpers.compose_path(socket, :message_id, message.id)
+      )
     else
-      Message.update_draft(message, %{"subject" => subject, "body" => body})
+      message = Message.update_draft(message, %{"subject" => subject, "body" => body})
+      assign(socket, :message, message)
     end
   end
 

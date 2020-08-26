@@ -98,6 +98,9 @@ Current label: <%= @label %>
           <% end %>
           </li>
           <li>
+            Subject: <%= message.subject %>
+          </li>
+          <li>
           Date: <%= message.date %>
           </li>
 
@@ -108,6 +111,8 @@ Current label: <%= @label %>
             <% end %>
           </li>
           </ul>
+
+          <%= Phoenix.HTML.Link.link "Edit", to: PhailWeb.Router.Helpers.compose_path(@socket, :message_id, message.id), class: "button" %>
 
           <div class=body>
           <%= Phoenix.HTML.raw message.body %>

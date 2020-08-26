@@ -1,11 +1,14 @@
 <form phx-submit="submit" phx-change="save_draft">
 <ul>
   <li><label for="to">To</label><input name="to" id="to" type=text></li>
-  <li><label for="subject">Subject</label><input name="subject" id="to" type=text></li>
-  <li><label for="body">Body</label><textarea id="body" name="body"></textarea></li>
+  <li>
+    <label for="subject">Subject</label>
+    <input name="subject" id="to" type=text value="<%= @message.subject %>">
+  </li>
+  <li><label for="body">Body</label><textarea id="body" name="body"><%= @message.body %></textarea></li>
 
   <input type="submit" name=submit value="Send">
-  <input type="submit" name=submit value="Save">
+  <button phx-click="close">Close</button>
   <button phx-click="discard_and_close">Discard</button>
 </ul>
 </form>

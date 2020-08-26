@@ -94,6 +94,10 @@ body {
   background: #eeeeee;
 }
 
+main.container {
+  max-width: none;
+}
+
 .mailbox {
   list-style: none;
 }

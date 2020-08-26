@@ -6,7 +6,7 @@ Current label: <%= @label %>
     <input name=filter placeholder="Search mail..." value="<%= @search_filter %>"</input>
   </form>
 
-  <%= Phoenix.HTML.Link.link "Compose", to: Routes.live_path(@socket, PhailWeb.Live.Compose), class: "button" %>
+  <%= link "Compose", to: Routes.live_path(@socket, PhailWeb.Live.Compose), class: "button" %>
 </div>
 
 <div class="side">
@@ -112,10 +112,10 @@ Current label: <%= @label %>
           </li>
           </ul>
 
-          <%= Phoenix.HTML.Link.link "Edit", to: Routes.compose_path(@socket, :message_id, message.id), class: "button" %>
+          <%= link "Edit", to: Routes.compose_path(@socket, :message_id, message.id), class: "button" %>
 
           <div class=body>
-          <%= Phoenix.HTML.raw message.body %>
+          <%= raw message.body %>
           </div>
         </div>
         <% end %>

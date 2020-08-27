@@ -83,7 +83,7 @@ defmodule PhailWeb.Live.Phail do
   end
 
   def handle_event("discard", %{"message_id" => message_id}, socket) do
-    Message.get(String.to_integer(message_id)) |> Message.delete
+    Message.get(String.to_integer(message_id)) |> Message.delete()
 
     socket
     |> assign(:expanded, nil)

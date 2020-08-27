@@ -71,7 +71,7 @@ defmodule Phail.Message do
   def add_to_address(message, to_address) do
     message
     |> Changeset.change()
-    |> Changeset.put_assoc(:to_addresses, [to_address|message.to_addresses])
+    |> Changeset.put_assoc(:to_addresses, [to_address | message.to_addresses])
     |> Repo.update!()
   end
 

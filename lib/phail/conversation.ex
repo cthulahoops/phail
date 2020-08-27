@@ -52,7 +52,11 @@ defmodule Phail.Conversation do
       join: m in Message,
       on: c.id == m.conversation_id,
       left_join: l in assoc(m, :labels),
-      select: %{c | date: max(m.date), labels: fragment("array_remove(array_agg(distinct ?), null)", l.name)},
+      select: %{
+        c
+        | date: max(m.date),
+          labels: fragment("array_remove(array_agg(distinct ?), null)", l.name)
+      },
       group_by: c.id,
       order_by: [desc: max(m.date)],
       limit: 20,

@@ -32,7 +32,7 @@ defmodule PhailWeb.Live.Compose do
     noreply(socket)
   end
 
-  def handle_event("change", mail_data=%{"add_to" => add_to}, socket) do
+  def handle_event("change", mail_data = %{"add_to" => add_to}, socket) do
     socket
     |> update_suggestions(add_to, socket.assigns.add_to)
     |> save_message(mail_data)
@@ -49,10 +49,11 @@ defmodule PhailWeb.Live.Compose do
     if !is_nil(socket.assigns.message.id) do
       Message.delete(socket.assigns.message)
     end
+
     handle_event("close", mail_data, socket)
   end
 
-  def handle_event("add_to", %{ "id" => id }, socket) do
+  def handle_event("add_to", %{"id" => id}, socket) do
     socket
     |> add_to_address(Address.get(String.to_integer(id)), socket.assigns.message)
     |> update_suggestions("", socket.assigns.add_to)
@@ -100,18 +101,19 @@ defmodule PhailWeb.Live.Compose do
     end
   end
 
-  defp add_to_address(socket, to_address=%Address{}) do
+  defp add_to_address(socket, to_address = %Address{}) do
     add_to_address(socket, to_address, socket.assigns.message)
   end
 
-  defp add_to_address(socket, to_address=%Address{}, %{ :id => nil }) do
+  defp add_to_address(socket, to_address = %Address{}, %{:id => nil}) do
     save_message(socket, %{"subject" => "", "body" => ""})
     add_to_address(socket, to_address)
   end
 
-  defp add_to_address(socket, to_address=%Address{}, message=%Message{}) do
+  defp add_to_address(socket, to_address = %Address{}, message = %Message{}) do
     updated_message = Message.add_to_address(message, to_address)
-    socket |>
-    assign(:message, updated_message)
+
+    socket
+    |> assign(:message, updated_message)
   end
 end

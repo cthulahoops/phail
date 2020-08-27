@@ -52,10 +52,13 @@ defmodule Phail.Address do
 
   def prefix_search(prefix_string) do
     search_pattern = "#{prefix_string}%"
+
     from(a in Address,
-      where: ilike(a.name, ^search_pattern)
-        or ilike(a.address, ^search_pattern),
-      limit: 5)
+      where:
+        ilike(a.name, ^search_pattern) or
+          ilike(a.address, ^search_pattern),
+      limit: 5
+    )
     |> Repo.all()
   end
 end

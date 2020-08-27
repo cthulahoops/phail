@@ -35,7 +35,7 @@ defmodule PhailWeb.Live.Compose do
   def handle_event("change", mail_data = %{"add_to" => add_to}, socket) do
     socket
     |> update_suggestions(add_to, socket.assigns.add_to)
-    |> save_message(mail_data)
+    |> update_message(fn message -> Message.update_draft(message, mail_data) end)
     |> noreply
   end
 
@@ -54,8 +54,10 @@ defmodule PhailWeb.Live.Compose do
   end
 
   def handle_event("add_to", %{"id" => id}, socket) do
+    to_address = Address.get(String.to_integer(id))
+
     socket
-    |> add_to_address(Address.get(String.to_integer(id)), socket.assigns.message)
+    |> update_message(fn message -> Message.add_to_address(message, to_address) end)
     |> update_suggestions("", socket.assigns.add_to)
     |> noreply
   end
@@ -87,33 +89,19 @@ defmodule PhailWeb.Live.Compose do
     |> assign(:add_to, add_to)
   end
 
-  defp save_message(socket, %{"subject" => subject, "body" => body}) do
-    message = socket.assigns.message
+  defp ensure_message(socket) do
+    if is_nil(socket.assigns.message.id) do
+      message = Message.create_draft([], [], [], "", "")
 
-    if is_nil(message.id) do
-      message = Message.create_draft([], [], [], subject, body)
-
-      assign(socket, :message, message)
+      assign(socket, :message)
       |> push_patch(to: Routes.compose_path(socket, :message_id, message.id))
     else
-      message = Message.update_draft(message, %{"subject" => subject, "body" => body})
-      assign(socket, :message, message)
+      socket
     end
   end
 
-  defp add_to_address(socket, to_address = %Address{}) do
-    add_to_address(socket, to_address, socket.assigns.message)
-  end
-
-  defp add_to_address(socket, to_address = %Address{}, %{:id => nil}) do
-    save_message(socket, %{"subject" => "", "body" => ""})
-    add_to_address(socket, to_address)
-  end
-
-  defp add_to_address(socket, to_address = %Address{}, message = %Message{}) do
-    updated_message = Message.add_to_address(message, to_address)
-
-    socket
-    |> assign(:message, updated_message)
+  defp update_message(socket, fun) do
+    socket = ensure_message(socket)
+    assign(socket, :message, fun.(socket.assigns.message))
   end
 end

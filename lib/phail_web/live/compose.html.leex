@@ -1,5 +1,5 @@
 <form phx-submit="submit" phx-change="change">
-<ul>
+<ul class=form_items>
   <li><label for="to">To</label>
     <ul>
     <%= for to <- @message.to_addresses do %>
@@ -7,13 +7,15 @@
     <% end %>
     </ul>
     <input name="add_to" id="to" type=text>
-    <ul class=autocomplete>
-    <%= for suggestion <- @suggestions do %>
-      <li phx-click="add_to" phx-value-id="<%= suggestion.id %>">
-        <%= Address.display(suggestion) %>
-      </li>
+    <%= if @suggestions != [] do %>
+      <ul class=autocomplete>
+      <%= for suggestion <- @suggestions do %>
+        <li phx-click="add_to" phx-value-id="<%= suggestion.id %>">
+          <%= Address.display(suggestion) %>
+        </li>
+      <% end %>
+      </ul>
     <% end %>
-    </ul>
   </li>
   <li>
     <label for="subject">Subject</label>

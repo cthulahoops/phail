@@ -68,6 +68,13 @@ defmodule Phail.Message do
     |> Repo.update!()
   end
 
+  def add_to_address(message, to_address) do
+    message
+    |> Changeset.change()
+    |> Changeset.put_assoc(:to_addresses, [to_address|message.to_addresses])
+    |> Repo.update!()
+  end
+
   def create_draft(from, to, cc, subject, body) do
     conversation = Conversation.create("Draft Message")
     create(conversation, from, to, cc, subject, body, [], is_draft: true)

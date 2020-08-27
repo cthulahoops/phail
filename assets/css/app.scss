@@ -175,3 +175,22 @@ span.message_label {
 .main {
   grid-area: main;
 }
+
+ul.autocomplete {
+  list-style: none;
+  position: absolute;
+  border: 1px solid #a577b5;
+  z-index: 1;
+  background: white;
+  margin: 0;
+}
+
+ul.autocomplete li {
+  display: hover;
+  margin: 0px;
+  padding: 10px;
+}
+
+ul.autocomplete li:hover {
+  background-color: #a577b5;
+}

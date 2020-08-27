@@ -62,6 +62,14 @@ defmodule PhailWeb.Live.Compose do
     |> noreply
   end
 
+  def handle_event("remove_to_address", %{"id" => id}, socket) do
+    to_address = Address.get(String.to_integer(id))
+
+    socket
+    |> update_message(fn message -> Message.remove_to_address(message, to_address) end)
+    |> noreply
+  end
+
   defp close(socket) do
     push_redirect(socket,
       to: Routes.phail_path(socket, :label, "Inbox")

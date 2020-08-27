@@ -24,13 +24,15 @@ defmodule Phail.Message do
     many_to_many(
       :to_addresses,
       Address,
-      join_through: "message_to_address"
+      join_through: "message_to_address",
+      on_replace: :delete
     )
 
     many_to_many(
       :cc_addresses,
       Address,
-      join_through: "message_cc_address"
+      join_through: "message_cc_address",
+      on_replace: :delete
     )
 
     many_to_many(
@@ -72,6 +74,13 @@ defmodule Phail.Message do
     message
     |> Changeset.change()
     |> Changeset.put_assoc(:to_addresses, [to_address | message.to_addresses])
+    |> Repo.update!()
+  end
+
+  def remove_to_address(message, to_address) do
+    message
+    |> Changeset.change()
+    |> Changeset.put_assoc(:to_addresses, List.delete(message.to_addresses, to_address))
     |> Repo.update!()
   end
 

@@ -3,7 +3,7 @@
   <li><label for="to">To</label>
     <ul>
     <%= for to <- @message.to_addresses do %>
-      <li><%= Address.display(to) %></li>
+      <li><%= Address.display(to) %><a phx-click="remove_to_address" phx-value-id="<%= to.id %>">Remove</a></li>
     <% end %>
     </ul>
     <input name="add_to" id="to" type=text>

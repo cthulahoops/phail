@@ -34,7 +34,7 @@ defmodule PhailWeb.Live.Compose do
 
   def handle_event("change", mail_data = %{"add_to" => add_to}, socket) do
     socket
-    |> update_suggestions(add_to, socket.assigns.add_to)
+    |> update_suggestions(add_to)
     |> update_message(fn message -> Message.update_draft(message, mail_data) end)
     |> noreply
   end
@@ -58,7 +58,7 @@ defmodule PhailWeb.Live.Compose do
 
     socket
     |> update_message(fn message -> Message.add_to_address(message, to_address) end)
-    |> update_suggestions("", socket.assigns.add_to)
+    |> update_suggestions("")
     |> noreply
   end
 
@@ -81,6 +81,10 @@ defmodule PhailWeb.Live.Compose do
   #   |> noreply
   # end
   #
+  defp update_suggestions(socket, add_to) do
+    update_suggestions(socket, add_to, socket.assigns.add_to)
+  end
+
   defp update_suggestions(socket, add_to, add_to) do
     socket
   end

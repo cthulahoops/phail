@@ -23,6 +23,8 @@ defmodule PhailWeb.Router do
 
     live "/compose/", Live.Compose
     live "/compose/:message_id/", Live.Compose, :message_id
+    live "/reply/:reply_to/", Live.Compose, :reply_to
+    live "/reply/:reply_to/:message_id/", Live.Compose, :reply_to_draft
   end
 
   # Other scopes may use custom stacks.

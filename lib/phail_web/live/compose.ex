@@ -1,6 +1,6 @@
 defmodule PhailWeb.Live.Compose do
   use PhailWeb, :live_view
-  alias Phail.{Address, Message}
+  alias Phail.{Address, Conversation, Message}
 
   defp noreply(socket) do
     {:noreply, socket}
@@ -15,7 +15,16 @@ defmodule PhailWeb.Live.Compose do
     |> assign(:message, Message.get(message_id))
     |> assign(:add_to, "")
     |> assign(:suggestions, [])
-    |> assign(:to_addresses, [])
+    |> ok
+  end
+
+  def mount(%{"reply_to" => reply_to}, _session, socket) do
+    reply_to = Message.get(reply_to)
+
+    socket
+    |> assign(:reply_to, reply_to)
+    |> new_reply(reply_to)
+    |> assign(:suggestions, [])
     |> ok
   end
 
@@ -103,9 +112,13 @@ defmodule PhailWeb.Live.Compose do
 
   defp ensure_message(socket) do
     if is_nil(socket.assigns.message.id) do
-      message = Message.create_draft([], [], [], "", "")
+      message =
+        Message.create(
+          Conversation.create("Draft Message"),
+          is_draft: true
+        )
 
-      assign(socket, :message)
+      assign(socket, :message, message)
       |> push_patch(to: Routes.compose_path(socket, :message_id, message.id))
     else
       socket
@@ -115,5 +128,12 @@ defmodule PhailWeb.Live.Compose do
   defp update_message(socket, fun) do
     socket = ensure_message(socket)
     assign(socket, :message, fun.(socket.assigns.message))
+  end
+
+  defp new_reply(socket, reply_to) do
+    message = Phail.Reply.create(reply_to)
+
+    assign(socket, :message, message)
+    |> push_redirect(to: Routes.compose_path(socket, :reply_to_draft, reply_to.id, message.id))
   end
 end

@@ -112,8 +112,12 @@ Current label: <%= @label %>
           </li>
           </ul>
 
+          <%= if message.is_draft do %>
           <%= link "Edit", to: Routes.compose_path(@socket, :message_id, message.id), class: "button" %>
           <button phx-click="discard" phx-event="discard" phx-value-message_id="<%= message.id %>">Discard</button>
+          <% else %>
+          <%= link "Reply", to: Routes.compose_path(@socket, :reply_to, message.id), class: "button" %>
+          <% end %>
           <div class=body>
           <%= raw message.body %>
           </div>

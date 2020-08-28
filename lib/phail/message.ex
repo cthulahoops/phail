@@ -44,12 +44,14 @@ defmodule Phail.Message do
     )
   end
 
-  def create(conversation, from, to, cc, subject, body, labels, options \\ []) do
+  def create(conversation, options \\ []) do
+    from = Keyword.get(options, :from, [])
+    to = Keyword.get(options, :to, [])
+    subject = Keyword.get(options, :subject, "")
+    body = Keyword.get(options, :body, "")
+    cc = Keyword.get(options, :cc, [])
+    labels = Keyword.get(options, :labels, [])
     is_draft = Keyword.get(options, :is_draft, false)
-
-    from = Enum.map(from, &Address.get_or_create/1)
-    to = Enum.map(to, &Address.get_or_create/1)
-    cc = Enum.map(cc, &Address.get_or_create/1)
 
     %Message{
       subject: subject,
@@ -82,11 +84,6 @@ defmodule Phail.Message do
     |> Changeset.change()
     |> Changeset.put_assoc(:to_addresses, List.delete(message.to_addresses, to_address))
     |> Repo.update!()
-  end
-
-  def create_draft(from, to, cc, subject, body) do
-    conversation = Conversation.create("Draft Message")
-    create(conversation, from, to, cc, subject, body, [], is_draft: true)
   end
 
   def delete(message) do
@@ -127,7 +124,8 @@ defmodule Phail.Message do
       :from_addresses,
       :to_addresses,
       :cc_addresses,
-      :labels
+      :labels,
+      :conversation
     ])
   end
 

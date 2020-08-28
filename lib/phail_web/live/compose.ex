@@ -54,7 +54,7 @@ defmodule PhailWeb.Live.Compose do
   end
 
   def handle_event("add_to", %{"id" => id}, socket) do
-    to_address = Address.get(String.to_integer(id))
+    to_address = Address.get(id)
 
     socket
     |> update_message(fn message -> Message.add_to_address(message, to_address) end)
@@ -63,7 +63,7 @@ defmodule PhailWeb.Live.Compose do
   end
 
   def handle_event("remove_to_address", %{"id" => id}, socket) do
-    to_address = Address.get(String.to_integer(id))
+    to_address = Address.get(id)
 
     socket
     |> update_message(fn message -> Message.remove_to_address(message, to_address) end)

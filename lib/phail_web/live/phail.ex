@@ -63,9 +63,7 @@ defmodule PhailWeb.Live.Phail do
   end
 
   def handle_event("expand", %{"id" => conversation_id}, socket) do
-    conversation_id = String.to_integer(conversation_id)
-
-    if is_expanded(conversation_id, socket.assigns.expanded) do
+    if is_expanded(String.to_integer(conversation_id), socket.assigns.expanded) do
       socket |> assign(:expanded, nil)
     else
       socket |> assign(:expanded, Conversation.get(conversation_id))
@@ -83,7 +81,7 @@ defmodule PhailWeb.Live.Phail do
   end
 
   def handle_event("discard", %{"message_id" => message_id}, socket) do
-    Message.get(String.to_integer(message_id)) |> Message.delete()
+    Message.get(message_id) |> Message.delete()
 
     socket
     |> assign(:expanded, nil)
@@ -92,8 +90,6 @@ defmodule PhailWeb.Live.Phail do
   end
 
   defp change_labels(conversation_id, old_label, new_label) do
-    conversation_id = String.to_integer(conversation_id)
-
     if old_label != nil do
       Conversation.remove_label(conversation_id, old_label)
     end

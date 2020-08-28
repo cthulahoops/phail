@@ -1,7 +1,7 @@
 defmodule Phail.Reply do
   alias Phail.Message
 
-  def create(original_message=%Message{}) do
+  def create(original_message = %Message{}) do
     Message.create(
       original_message.conversation,
       to: original_message.from_addresses,

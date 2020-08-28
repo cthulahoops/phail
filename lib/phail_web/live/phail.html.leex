@@ -44,7 +44,6 @@ Current label: <%= @label %>
         <span class=date><%= conversation.date %></span>
       </div>
       <%= if !is_nil(@expanded) && conversation.id == @expanded.id do %>
-
       <div class="conversation_buttons">
         <%= if @label != 'Inbox' do %>
           <button

@@ -11,8 +11,10 @@ defmodule PhailWeb.Live.Compose do
   end
 
   def mount(%{"message_id" => message_id}, _session, socket) do
+    message = Message.get(message_id)
     socket
-    |> assign(:message, Message.get(message_id))
+    |> assign(:message, message)
+    |> assign(:conversation, Conversation.get(message.conversation.id))
     |> assign(:add_to, "")
     |> assign(:suggestions, [])
     |> ok
@@ -30,7 +32,13 @@ defmodule PhailWeb.Live.Compose do
 
   def mount(%{}, _session, socket) do
     socket
-    |> assign(:message, %{:subject => "", :body => "", :id => nil, :to_addresses => []})
+    |> assign(:message, %{
+      :subject => "",
+      :body => "",
+      :id => nil,
+      :to_addresses => [],
+    })
+    |> assign(:conversation, :nil)
     |> assign(:add_to, "")
     |> assign(:suggestions, [])
     |> ok

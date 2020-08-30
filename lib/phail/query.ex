@@ -41,4 +41,18 @@ defmodule Phail.Query do
   defp quoted_string(parser \\ nil) do
     between(parser, char("\""), word_of(~r/[^"]/), char("\""))
   end
+
+
+  def format_label(label_name) do
+    quoted_label_name = if String.match?(label_name, ~r/^\w*$/) do
+      label_name
+    else
+      "\"" <> label_name <> "\""
+    end
+    "label:" <> quoted_label_name
+  end
+
+  def format(query) do
+    Enum.join(Enum.map(query.labels, &format_label/1), " ") <> " " <> Enum.join(query.text_terms, " ")
+  end
 end

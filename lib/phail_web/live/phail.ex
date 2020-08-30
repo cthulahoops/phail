@@ -27,7 +27,7 @@ defmodule PhailWeb.Live.Phail do
 
   def handle_params(%{"label" => label}, _uri, socket) do
     socket
-    |> assign(:search_filter, "")
+    |> assign(:search_filter, Phail.Query.format_label(label))
     |> assign(:label, label)
     |> assign_conversations
     |> noreply

@@ -27,7 +27,7 @@ defmodule Phail.Conversation do
   end
 
   def search(search_term) do
-    query = Query.parse_query(search_term)
+    query = Query.parse(search_term)
 
     select_conversations()
     |> text_search(query.text)

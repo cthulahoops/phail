@@ -30,7 +30,7 @@ defmodule Phail.Conversation do
     query = Query.parse(search_term)
 
     select_conversations()
-    |> text_search(query.text)
+    |> text_search(Enum.join(query.text_terms, " & "))
     |> filter_labels(query.labels)
     |> Repo.all()
   end

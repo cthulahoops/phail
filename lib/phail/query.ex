@@ -1,14 +1,16 @@
 defmodule Phail.Query do
   use Combine
-  defstruct labels: [], text: ""
+  defstruct labels: [], text: []
 
   def parse(query_string) do
     query_terms = hd(Combine.parse(query_string, parser()))
     text_terms = for {:text, text} <- query_terms, do: text
-    text = Enum.join(text_terms, " & ")
     labels = for {:label, label_name} <- query_terms, do: label_name
 
-    %Phail.Query{labels: labels, text: text}
+    %Phail.Query{
+      labels: labels,
+      text_terms: text_terms
+    }
   end
 
   defp parser, do: sep_by(search_term(), spaces())

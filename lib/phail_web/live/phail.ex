@@ -58,7 +58,7 @@ defmodule PhailWeb.Live.Phail do
     |> assign(:search_filter, filter)
     |> assign(:label, nil)
     |> assign_conversations
-    |> go_page
+    |> update_url_with_search_filter
     |> noreply
   end
 
@@ -98,7 +98,7 @@ defmodule PhailWeb.Live.Phail do
     Conversation.add_label(conversation, new_label)
   end
 
-  defp go_page(socket) do
+  defp update_url_with_search_filter(socket) do
     push_patch(socket,
       to: Routes.phail_path(socket, :search, socket.assigns.search_filter)
     )

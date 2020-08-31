@@ -102,21 +102,25 @@ main.container {
   list-style: none;
 }
 
-.conversation_header ul.name_list {
+.conversation_header ul.sender_list {
   display: inline-block;
   width: 30%;
+}
+
+ul.comma_separated {
+  display: inline;
   list-style: none;
 }
 
-.conversation_header ul.name_list li {
+ul.comma_separated li {
   display: inline;
 }
 
-.conversation_header ul.name_list li::after {
+ul.comma_separated li::after {
   content: ", ";
 }
 
-.conversation_header ul.name_list li:last-child::after {
+ul.comma_separated li:last-child::after {
   content: "";
 }
 

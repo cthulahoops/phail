@@ -25,15 +25,7 @@
   <%= for conversation <- @conversations do %>
     <li class="conversation">
       <div class="conversation_header" phx-value-id="<%= conversation.id %>" phx-click="expand">
-        <ul class="from">
-        <%= if length(conversation.from_addresses) == 1 do %>
-          <li><%= Phail.Address.display_name hd(conversation.from_addresses) %></li>
-        <% else %>
-        <%= for address <- conversation.from_addresses do %>
-          <li><%= Phail.Address.display_short address %></li>
-        <% end %>
-        <% end %>
-        </ul>
+        <%= PhailView.name_list conversation.from_addresses %>
         <span class=subject>
           <%= for label <- conversation.labels do %>
             <span class="message_label"><%= label %></span>
@@ -75,25 +67,16 @@
         <div class=message>
           <ul>
           <li>
-          From:
-          <%= for address <- message.from_addresses do %>
-             <span class=address title="<%= address.address %>"><%= Phail.Address.display address %></span>
-          <% end %>
+          From: <%= PhailView.address_list message.from_addresses %>
           </li>
           <li>
-          To:
-          <%= for address <- message.to_addresses do %>
-             <span class=address title="<%= address.address %>"><%= Phail.Address.display address %></span>
-          <% end %>
+            To: <%= PhailView.address_list message.to_addresses %>
           </li>
           <%= if message.cc_addresses != [] do %>
           <li>
-          Cc:
-          <%= for address <- message.cc_addresses do %>
-             <span class=address title="<%= address.address %>"><%= Phail.Address.display address %></span>
-          <% end %>
-          <% end %>
+          Cc: <%= PhailView.address_list message.cc_addresses %>
           </li>
+          <% end %>
           <li>
             Subject: <%= message.subject %>
           </li>

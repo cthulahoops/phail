@@ -3,7 +3,7 @@
   <li><label for="to">To</label>
     <ul>
     <%= for to <- @message.to_addresses do %>
-      <li><%= Address.display(to) %><a phx-click="remove_to_address" phx-value-id="<%= to.id %>">Remove</a></li>
+      <li><%= PhailView.format_address to %><a phx-click="remove_to_address" phx-value-id="<%= to.id %>">Remove</a></li>
     <% end %>
     </ul>
     <input name="add_to" id="to" type=text>
@@ -11,7 +11,7 @@
       <ul class=autocomplete>
       <%= for suggestion <- @suggestions do %>
         <li phx-click="add_to" phx-value-id="<%= suggestion.id %>">
-          <%= Address.display(suggestion) %>
+          <%= PhailView.format_address suggestion %>
         </li>
       <% end %>
       </ul>
@@ -37,26 +37,17 @@
       <%= for message <- @conversation.messages, !message.is_draft do %>
       <div class=message>
         <ul>
-        <li>
-        From:
-        <%= for address <- message.from_addresses do %>
-           <span class=address title="<%= address.address %>"><%= Phail.Address.display address %></span>
-        <% end %>
-        </li>
-        <li>
-        To:
-        <%= for address <- message.to_addresses do %>
-           <span class=address title="<%= address.address %>"><%= Phail.Address.display address %></span>
-        <% end %>
-        </li>
-        <%= if message.cc_addresses != [] do %>
-        <li>
-        Cc:
-        <%= for address <- message.cc_addresses do %>
-           <span class=address title="<%= address.address %>"><%= Phail.Address.display address %></span>
-        <% end %>
-        <% end %>
-        </li>
+          <li>
+          From: <%= PhailView.address_list message.from_addresses %>
+          </li>
+          <li>
+            To: <%= PhailView.address_list message.to_addresses %>
+          </li>
+          <%= if message.cc_addresses != [] do %>
+          <li>
+          Cc: <%= PhailView.address_list message.cc_addresses %>
+          </li>
+          <% end %>
         <li>
           Subject: <%= message.subject %>
         </li>

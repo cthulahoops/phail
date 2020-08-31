@@ -1,5 +1,6 @@
 defmodule PhailWeb.Live.Compose do
   use PhailWeb, :live_view
+  alias PhailWeb.PhailView
   alias Phail.{Address, Conversation, Message}
 
   defp noreply(socket) do

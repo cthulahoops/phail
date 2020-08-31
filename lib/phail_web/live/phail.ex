@@ -1,5 +1,6 @@
 defmodule PhailWeb.Live.Phail do
   use PhailWeb, :live_view
+  alias PhailWeb.PhailView
   alias Phail.{Conversation, Message, Label}
 
   defp noreply(socket) do

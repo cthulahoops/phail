@@ -102,21 +102,21 @@ main.container {
   list-style: none;
 }
 
-.conversation ul.from {
+.conversation_header ul.name_list {
   display: inline-block;
   width: 30%;
   list-style: none;
 }
 
-.conversation ul.from li {
+.conversation_header ul.name_list li {
   display: inline;
 }
 
-.conversation ul.from li::after {
+.conversation_header ul.name_list li::after {
   content: ", ";
 }
 
-.conversation ul.from li:last-child::after {
+.conversation_header ul.name_list li:last-child::after {
   content: "";
 }
 

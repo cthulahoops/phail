@@ -31,43 +31,5 @@
 </form>
 
 <%= if !is_nil(@conversation) do %>
-
-<div content="conversation">
-    <div class="conversation_contents">
-      <%= for message <- @conversation.messages, !message.is_draft do %>
-      <div class=message>
-        <ul>
-          <li>
-          From: <%= PhailView.address_list message.from_addresses %>
-          </li>
-          <li>
-            To: <%= PhailView.address_list message.to_addresses %>
-          </li>
-          <%= if message.cc_addresses != [] do %>
-          <li>
-          Cc: <%= PhailView.address_list message.cc_addresses %>
-          </li>
-          <% end %>
-        <li>
-          Subject: <%= message.subject %>
-        </li>
-        <li>
-        Date: <%= message.date %>
-        </li>
-
-        <li>
-          Labels:
-          <%= for label <- message.labels do %>
-            <span class="message_label"><%= label.name %></span>
-          <% end %>
-        </li>
-        </ul>
-        <div class=body>
-        <%= raw message.body %>
-        </div>
-      </div>
-      <% end %>
-    </div>
-</div>
-
+    <%= live_component(@socket, PhailWeb.Live.Conversation, id: @conversation.id, conversation: @conversation) %>
 <% end %>

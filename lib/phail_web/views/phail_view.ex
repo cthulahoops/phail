@@ -4,6 +4,7 @@ defmodule PhailWeb.PhailView do
 
   def name_list(addresses) do
     assigns = %{addresses: addresses}
+
     ~L"""
         <ul class="sender_list comma_separated">
         <%= if length(addresses) == 1 do %>
@@ -28,7 +29,7 @@ defmodule PhailWeb.PhailView do
     </ul>
     """
   end
-  
+
   def format_address(%Address{address: address, name: ""}), do: address
   def format_address(%Address{address: address, name: name}), do: name <> " <" <> address <> ">"
 

@@ -6,7 +6,6 @@ defmodule Phail.Message do
   alias Phail.Repo
   alias Phail.Address
   alias Phail.Conversation
-  alias Phail.Label
 
   schema "messages" do
     field(:subject, :string)
@@ -34,14 +33,6 @@ defmodule Phail.Message do
       join_through: "message_cc_address",
       on_replace: :delete
     )
-
-    many_to_many(
-      :labels,
-      Label,
-      join_through: "message_labels",
-      on_replace: :delete,
-      on_delete: :delete_all
-    )
   end
 
   def create(conversation, options \\ []) do
@@ -50,7 +41,6 @@ defmodule Phail.Message do
     subject = Keyword.get(options, :subject, "")
     body = Keyword.get(options, :body, "")
     cc = Keyword.get(options, :cc, [])
-    labels = Keyword.get(options, :labels, [])
     is_draft = Keyword.get(options, :is_draft, false)
 
     %Message{
@@ -60,7 +50,6 @@ defmodule Phail.Message do
       to_addresses: [],
       from_addresses: [],
       cc_addresses: [],
-      labels: [],
       conversation: conversation
     }
     |> Repo.insert!()
@@ -68,7 +57,6 @@ defmodule Phail.Message do
     |> Changeset.put_assoc(:from_addresses, from)
     |> Changeset.put_assoc(:to_addresses, to)
     |> Changeset.put_assoc(:cc_addresses, cc)
-    |> Changeset.put_assoc(:labels, labels)
     |> Repo.update!()
   end
 
@@ -124,18 +112,11 @@ defmodule Phail.Message do
       :from_addresses,
       :to_addresses,
       :cc_addresses,
-      :labels,
       :conversation
     ])
   end
 
   def all() do
     Message |> Repo.all() |> Repo.preload([:from_addresses, :to_addresses, :cc_addresses])
-  end
-
-  def add_label(message, label) do
-    Changeset.change(message)
-    |> Changeset.put_assoc(:labels, [label | message.labels])
-    |> Repo.update!()
   end
 end

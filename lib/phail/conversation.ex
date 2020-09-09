@@ -59,7 +59,6 @@ defmodule Phail.Conversation do
     from c in Conversation,
       join: m in Message,
       on: c.id == m.conversation_id,
-      left_join: l in assoc(c, :labels),
       select: %{
         c
         | date: max(m.date)
@@ -78,14 +77,23 @@ defmodule Phail.Conversation do
     conversations |> where([_c, m], fulltext(space_join(m.body, m.subject), ^search_term))
   end
 
-  # TODO: Support filtering more than one label.
-  defp filter_labels(conversations, [label|_]) do
-    conversations
-    |> where([_c, _m, l], ^label == l.name)
+  defp filter_labels(conversation_query, label_names) do
+    Enum.reduce(label_names, conversation_query, &filter_label/2)
   end
 
-  defp filter_drafts(conversations) do
-    conversations
+  defp filter_label(label_name, conversation_query) do
+    conversation_query
+    |> where([c, _m], c.id in subquery(
+      from cl in "conversation_labels",
+      select: cl.conversation_id,
+      join: l in Label,
+      on: l.id == cl.label_id,
+      where: l.name == ^label_name
+    ))
+  end
+
+  defp filter_drafts(conversation_query) do
+    conversation_query
     |> where([_c, m, _l], m.is_draft)
   end
 

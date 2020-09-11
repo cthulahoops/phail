@@ -47,12 +47,12 @@ def get_label(name):
     cursor.execute("select id from labels where name = %s", (name,))
     return cursor.fetchone() or create_label(name)
 
-def insert_label_assoc(message_id, label_name):
+def insert_label_assoc(conversation_id, label_name):
     label_id = get_label(label_name)
     cursor = dbh.cursor()
     cursor.execute(
-        "insert into message_labels (message_id, label_id) values (%s, %s) on conflict do nothing",
-        (message_id, label_id))
+        "insert into conversation_labels (conversation_id, label_id) values (%s, %s) on conflict do nothing",
+        (conversation_id, label_id))
 
 
 def insert_reference(message_id, reference):
@@ -126,17 +126,19 @@ def insert_message(message):
     for reference in message.references:
         insert_reference(message_id, reference)
 
-    for label in message.labels:
-        insert_label_assoc(message_id, label)
-    dbh.commit()
-
     conversation_id = get_conversation(message)
     with dbh.cursor() as cursor:
         cursor.execute("update messages set conversation_id = %s where id = %s",
             (conversation_id, message_id))
 
+    for label in message.labels:
+        insert_label_assoc(conversation_id, label)
+
+
     for address_id in from_addresses:
         insert_conversation_from(conversation_id, address_id)
+
+    dbh.commit()
 
 
 

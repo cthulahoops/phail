@@ -2,6 +2,7 @@ defmodule Phail.Conversation do
   import Ecto.Query
   import Phail.TextSearch
   use Ecto.Schema
+  alias Ecto.Changeset
   alias Phail.{Conversation, Message, Label, Address}
   alias Phail.Repo
   alias Phail.Query
@@ -9,10 +10,17 @@ defmodule Phail.Conversation do
   schema "conversations" do
     field :subject, :string
     field :date, :utc_datetime, virtual: true
-    field :labels, :any, virtual: true
 
     has_many(:messages, Message)
     many_to_many(:from_addresses, Address, join_through: "conversation_from_address")
+
+    many_to_many(
+      :labels,
+      Label,
+      join_through: "conversation_labels",
+      on_replace: :delete,
+      on_delete: :delete_all
+    )
   end
 
   def create(subject) do
@@ -51,16 +59,14 @@ defmodule Phail.Conversation do
     from c in Conversation,
       join: m in Message,
       on: c.id == m.conversation_id,
-      left_join: l in assoc(m, :labels),
       select: %{
         c
-        | date: max(m.date),
-          labels: fragment("array_remove(array_agg(distinct ?), null)", l.name)
+        | date: max(m.date)
       },
       group_by: c.id,
       order_by: [desc: max(m.date)],
       limit: 20,
-      preload: [:from_addresses]
+      preload: [:from_addresses, :labels]
   end
 
   defp text_search(conversations, "") do
@@ -71,28 +77,39 @@ defmodule Phail.Conversation do
     conversations |> where([_c, m], fulltext(space_join(m.body, m.subject), ^search_term))
   end
 
-  defp filter_labels(conversations, labels) do
-    conversations
-    |> having([_c, _m, l], fragment("? <@ array_agg(?)", ^labels, l.name))
+  defp filter_labels(conversation_query, label_names) do
+    Enum.reduce(label_names, conversation_query, &filter_label/2)
   end
 
-  defp filter_drafts(conversations) do
-    conversations
+  defp filter_label(label_name, conversation_query) do
+    conversation_query
+    |> where([c, _m], c.id in subquery(
+      from cl in "conversation_labels",
+      select: cl.conversation_id,
+      join: l in Label,
+      on: l.id == cl.label_id,
+      where: l.name == ^label_name
+    ))
+  end
+
+  defp filter_drafts(conversation_query) do
+    conversation_query
     |> where([_c, m, _l], m.is_draft)
   end
 
+  # TODO Write a test to check this works.
   def add_label(conversation, label_name) do
     label = Label.get_or_create(label_name)
-    Enum.each(conversation.messages, fn message -> Message.add_label(message, label) end)
+    Changeset.change(conversation)
+    |> Changeset.put_assoc(:labels, [label | conversation.labels])
+    |> Repo.update!()
   end
 
   def remove_label(conversation_id, label_name) do
-    from(j in "message_labels",
-      join: m in Message,
-      on: m.id == j.message_id,
+    from(cl in "conversation_labels",
       join: l in Label,
-      on: l.id == j.label_id,
-      where: m.conversation_id == ^conversation_id,
+      on: l.id == cl.label_id,
+      where: cl.conversation_id == ^conversation_id,
       where: l.name == ^label_name
     )
     |> Repo.delete_all()
@@ -101,6 +118,7 @@ defmodule Phail.Conversation do
   def get(id) do
     Conversation
     |> Repo.get(id)
+    |> Repo.preload(:labels)
     |> Repo.preload(
       messages:
         from(m in Message,
@@ -109,7 +127,6 @@ defmodule Phail.Conversation do
             :from_addresses,
             :to_addresses,
             :cc_addresses,
-            :labels
           ]
         )
     )

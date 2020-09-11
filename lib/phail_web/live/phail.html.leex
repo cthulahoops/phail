@@ -28,7 +28,7 @@
         <%= PhailView.name_list conversation.from_addresses %>
         <span class=subject>
           <%= for label <- conversation.labels do %>
-            <span class="message_label"><%= label %></span>
+            <span class="conversation_label"><%= label.name %></span>
           <% end %>
           <%= conversation.subject %></span>
         <span class=date><%= conversation.date %></span>

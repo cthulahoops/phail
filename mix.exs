@@ -48,8 +48,9 @@ defmodule Phail.MixProject do
       {:jason, "~> 1.0"},
       {:plug_cowboy, "~> 2.0"},
       {:timex, "~> 3.5"},
-      {:combine, "~> 0.5"}
       {:combine, "~> 0.5"},
+      {:bamboo, "~> 1.5"},
+      {:bamboo_smtp, "~> 3.0.0"},
       { :elixir_uuid, "~> 1.2" }
     ]
   end

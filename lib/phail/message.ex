@@ -1,4 +1,5 @@
 defmodule Phail.Message do
+  alias Bamboo.Email
   import Ecto.Query
   alias Ecto.Changeset
   use Ecto.Schema
@@ -120,6 +121,19 @@ defmodule Phail.Message do
 
   def all() do
     Message |> Repo.all() |> Repo.preload([:from_addresses, :to_addresses, :cc_addresses])
+  end
+
+  def send(message) do
+    email = Email.new_email(
+      from: Application.fetch_env!(:phail, :email_sender),
+      to: message.to_addresses,
+      subject: message.subject,
+      html_body: message.body,
+      headers: [
+        {"Message-Id", message.message_id}
+      ]
+    )
+    Phail.Mailer.deliver_now(email)
   end
 
   defp new_message_id do

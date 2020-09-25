@@ -52,4 +52,10 @@ defmodule Phail.Address do
     )
     |> Repo.all()
   end
+
+  defimpl Bamboo.Formatter, for: Phail.Address do
+    def format_email_address(address, _opts) do
+      {address.name, address.address}
+    end
+  end
 end

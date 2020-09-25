@@ -12,6 +12,7 @@ defmodule Phail.Message do
     field(:body, :string)
     field(:date, :utc_datetime)
     field(:is_draft, :boolean)
+    field(:message_id, :string)
     belongs_to(:conversation, Conversation)
 
     many_to_many(
@@ -50,7 +51,8 @@ defmodule Phail.Message do
       to_addresses: [],
       from_addresses: [],
       cc_addresses: [],
-      conversation: conversation
+      conversation: conversation,
+      message_id: new_message_id()
     }
     |> Repo.insert!()
     |> Changeset.change()
@@ -118,5 +120,9 @@ defmodule Phail.Message do
 
   def all() do
     Message |> Repo.all() |> Repo.preload([:from_addresses, :to_addresses, :cc_addresses])
+  end
+
+  defp new_message_id do
+    "<" <> UUID.uuid4() <> "@" <> Application.fetch_env!(:phail, :domain) <> ">"
   end
 end

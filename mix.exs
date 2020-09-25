@@ -49,6 +49,8 @@ defmodule Phail.MixProject do
       {:plug_cowboy, "~> 2.0"},
       {:timex, "~> 3.5"},
       {:combine, "~> 0.5"}
+      {:combine, "~> 0.5"},
+      { :elixir_uuid, "~> 1.2" }
     ]
   end
 

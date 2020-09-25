@@ -10,6 +10,8 @@ from config_secret import (host, user, password, database)
 
 dbh = psycopg2.connect(host=host, user=user, password=password, database=database)
 
+ignore_labels = ('Opened', 'Unread', 'Archived', 'Sent')
+
 def create_address(address):
     cursor = dbh.cursor()
     cursor.execute("insert into addresses (name, address) values (%s, %s) returning (id)", (
@@ -132,8 +134,9 @@ def insert_message(message):
             (conversation_id, message_id))
 
     for label in message.labels:
+        if label in ignore_labels:
+            continue
         insert_label_assoc(conversation_id, label)
-
 
     for address_id in from_addresses:
         insert_conversation_from(conversation_id, address_id)

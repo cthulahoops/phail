@@ -40,18 +40,19 @@ defmodule Phail.Conversation do
     select_conversations()
     |> text_search(Enum.join(query.text_terms, " & "))
     |> filter_labels(query.labels)
+    |> filter_message_statuses(query.statuses)
     |> Repo.all()
   end
 
   def select_by_label(label) do
     select_conversations()
-    |> filter_labels([label])
+    |> filter_label(label)
     |> Repo.all()
   end
 
   def select_drafts() do
     select_conversations()
-    |> filter_drafts
+    |> filter_message_status(:draft)
     |> Repo.all()
   end
 
@@ -78,10 +79,10 @@ defmodule Phail.Conversation do
   end
 
   defp filter_labels(conversation_query, label_names) do
-    Enum.reduce(label_names, conversation_query, &filter_label/2)
+    Enum.reduce(label_names, conversation_query, &filter_label(&2, &1))
   end
 
-  defp filter_label(label_name, conversation_query) do
+  defp filter_label(conversation_query, label_name) do
     conversation_query
     |> where(
       [c, _m],
@@ -95,9 +96,13 @@ defmodule Phail.Conversation do
     )
   end
 
-  defp filter_drafts(conversation_query) do
+  defp filter_message_statuses(conversation_query, statuses) do
+    Enum.reduce(statuses, conversation_query, &filter_message_status(&2, &1))
+  end
+
+  defp filter_message_status(conversation_query, status) do
     conversation_query
-    |> where([_c, m, _l], m.status == "draft")
+    |> where([_c, m, _l], m.status == ^status)
   end
 
   # TODO Write a test to check this works.

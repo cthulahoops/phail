@@ -13,22 +13,28 @@ defmodule ConversationTest do
 
   describe "Fetch conversations by status" do
     setup do
-      conversation = Conversation.create("Test Conversation")
-
+      sent_conversation = Conversation.create("Test Conversation")
       Message.create(
-        conversation,
+        sent_conversation,
         subject: "Test Message",
         body: "Some body text for the message",
         status: :sent
       )
 
-      %{conversation: conversation}
+      received_conversation = Conversation.create("Not a sent conversation")
+      Message.create(
+        received_conversation,
+        subject: "Received!",
+        body: "I received this"
+      )
+
+      %{sent_conversation: sent_conversation}
     end
 
-    test "Search for sent messages", %{conversation: conversation} do
+    test "Search for sent messages", %{sent_conversation: sent_conversation} do
       conversations = Conversation.search("is:sent")
 
-      assert [conversation.id] == conversation_ids(conversations)
+      assert [sent_conversation.id] == conversation_ids(conversations)
     end
   end
 end

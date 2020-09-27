@@ -3,6 +3,7 @@ import pathlib
 import mailbox
 
 import psycopg2
+import argparse
 
 from message import Message
 
@@ -100,7 +101,7 @@ def get_conversation(message):
         or get_referencing_conversation(message)
         or get_new_conversation(message))
 
-def insert_message(message):
+def insert_message(message, extra_labels=[]):
     if 'Chat' in message.labels:
         return # Skip chats for now!
 
@@ -133,7 +134,7 @@ def insert_message(message):
         cursor.execute("update messages set conversation_id = %s where id = %s",
             (conversation_id, message_id))
 
-    for label in message.labels:
+    for label in message.labels + extra_labels:
         if label in ignore_labels:
             continue
         insert_label_assoc(conversation_id, label)
@@ -155,9 +156,12 @@ def iter_file_messages(filename):
     for message in mbox:
         yield Message(message.as_bytes())
 
-def main():
+def read_message_from_stdin():
+    return Message(sys.stdin.buffer.read())
+
+def load_messages_from_file_or_directory(input_filename):
     i = 0
-    for message in iter_file_messages(sys.argv[1]):
+    for message in iter_file_messages(input_filename):
         try:
             insert_message(message)
         except:
@@ -168,4 +172,15 @@ def main():
         i += 1
 
 if __name__ == '__main__':
-    main()
+    parser = argparse.ArgumentParser("Load mail into phail")
+    parser.add_argument('-c', '--stdin', action='store_true', help='Read a message from stdin.')
+    parser.add_argument('-l', '--label', help="Apply label to message", action="append", default=[])
+    parser.add_argument('paths', nargs='*', help="Paths to mbox or maildir input")
+    args = parser.parse_args()
+
+    if args.stdin:
+        message = read_message_from_stdin()
+        insert_message(message, extra_labels=args.label)
+
+    for path in args.paths:
+        load_messages_from_file_or_directory(path)

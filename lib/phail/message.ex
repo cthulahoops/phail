@@ -126,6 +126,12 @@ defmodule Phail.Message do
     Message |> Repo.all() |> Repo.preload([:from_addresses, :to_addresses, :cc_addresses])
   end
 
+  def set_status(message, status) do
+    message
+    |> Changeset.cast(%{"status" => status}, [:status])
+    |> Repo.update!
+  end
+
   def send(message) do
     email = Email.new_email(
       from: Application.fetch_env!(:phail, :email_sender),
@@ -136,7 +142,10 @@ defmodule Phail.Message do
         {"Message-Id", message.message_id}
       ]
     )
+
+    set_status(message, :outbox)
     Phail.Mailer.deliver_now(email)
+    set_status(message, :sent)
   end
 
   defp new_message_id do

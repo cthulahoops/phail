@@ -92,6 +92,7 @@ defmodule PhailWeb.Live.Compose do
   def handle_event("submit", _mail_data, socket) do
     Message.send(socket.assigns.message)
     socket
+    |> close
     |> noreply
   end
 

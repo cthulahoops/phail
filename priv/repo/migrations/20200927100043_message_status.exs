@@ -3,7 +3,7 @@ defmodule Phail.Repo.Migrations.MessageStatus do
   alias Phail.Message.MessageStatus
 
   def change do
-    MessageStatus.create_type
+    MessageStatus.create_type()
 
     alter table(:messages) do
       add :status, MessageStatus.type()
@@ -12,14 +12,14 @@ defmodule Phail.Repo.Migrations.MessageStatus do
     create index(:messages, :status)
 
     execute(
-       "update messages set status = 'draft' where is_draft",
-       "update messages set is_draft = 't' where status = 'draft'"
-     )
+      "update messages set status = 'draft' where is_draft",
+      "update messages set is_draft = 't' where status = 'draft'"
+    )
 
     drop index(:messages, [:id], where: "is_draft is true")
 
     alter table(:messages) do
-       remove :is_draft, :boolean, default: false
+      remove :is_draft, :boolean, default: false
     end
   end
 end

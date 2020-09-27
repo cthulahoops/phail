@@ -9,7 +9,7 @@ defmodule Phail.Message do
   alias Phail.Address
   alias Phail.Conversation
 
-  defenum MessageStatus, :message_status, [:draft, :outbox, :sent]
+  defenum(MessageStatus, :message_status, [:draft, :outbox, :sent])
 
   schema "messages" do
     field(:subject, :string)
@@ -129,19 +129,20 @@ defmodule Phail.Message do
   def set_status(message, status) do
     message
     |> Changeset.cast(%{"status" => status}, [:status])
-    |> Repo.update!
+    |> Repo.update!()
   end
 
   def send(message) do
-    email = Email.new_email(
-      from: Application.fetch_env!(:phail, :email_sender),
-      to: message.to_addresses,
-      subject: message.subject,
-      html_body: message.body,
-      headers: [
-        {"Message-Id", message.message_id}
-      ]
-    )
+    email =
+      Email.new_email(
+        from: Application.fetch_env!(:phail, :email_sender),
+        to: message.to_addresses,
+        subject: message.subject,
+        html_body: message.body,
+        headers: [
+          {"Message-Id", message.message_id}
+        ]
+      )
 
     set_status(message, :outbox)
     Phail.Mailer.deliver_now(email)

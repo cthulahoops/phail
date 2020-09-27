@@ -83,13 +83,16 @@ defmodule Phail.Conversation do
 
   defp filter_label(label_name, conversation_query) do
     conversation_query
-    |> where([c, _m], c.id in subquery(
-      from cl in "conversation_labels",
-      select: cl.conversation_id,
-      join: l in Label,
-      on: l.id == cl.label_id,
-      where: l.name == ^label_name
-    ))
+    |> where(
+      [c, _m],
+      c.id in subquery(
+        from cl in "conversation_labels",
+          select: cl.conversation_id,
+          join: l in Label,
+          on: l.id == cl.label_id,
+          where: l.name == ^label_name
+      )
+    )
   end
 
   defp filter_drafts(conversation_query) do
@@ -100,6 +103,7 @@ defmodule Phail.Conversation do
   # TODO Write a test to check this works.
   def add_label(conversation, label_name) do
     label = Label.get_or_create(label_name)
+
     Changeset.change(conversation)
     |> Changeset.put_assoc(:labels, [label | conversation.labels])
     |> Repo.update!()
@@ -126,7 +130,7 @@ defmodule Phail.Conversation do
           preload: [
             :from_addresses,
             :to_addresses,
-            :cc_addresses,
+            :cc_addresses
           ]
         )
     )

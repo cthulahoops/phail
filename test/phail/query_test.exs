@@ -23,6 +23,14 @@ defmodule Phail.QueryTest do
     test "parse_extra_ws" do
       assert parse("   hello     world  ") == %Query{text_terms: ["hello", "world"]}
     end
+
+    test "parse_is_sent" do
+      assert parse("is:sent") == %Query{statuses: [:sent]}
+    end
+
+    test "parse_special_text_terms" do
+      assert parse("is label") == %Query{text_terms: ["is", "label"]}
+    end
   end
 
   describe "format/1" do
@@ -32,6 +40,10 @@ defmodule Phail.QueryTest do
 
     test "format_labels" do
       assert format(%Query{labels: ["Inbox"]}) == "label:Inbox"
+    end
+
+    test "format_statuses" do
+      assert format(%Query{statuses: [:sent]}) == "is:sent"
     end
   end
 

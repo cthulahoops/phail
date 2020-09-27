@@ -48,7 +48,7 @@ defmodule PhailWeb.Router do
     end
   end
 
-  if Mix.env == :dev do
-     forward "/sent_emails", Bamboo.SentEmailViewerPlug
+  if Mix.env() == :dev do
+    forward "/sent_emails", Bamboo.SentEmailViewerPlug
   end
 end

@@ -91,6 +91,7 @@ defmodule PhailWeb.Live.Compose do
 
   def handle_event("submit", _mail_data, socket) do
     Message.send(socket.assigns.message)
+
     socket
     |> close
     |> noreply
@@ -101,7 +102,7 @@ defmodule PhailWeb.Live.Compose do
       to: Routes.phail_path(socket, :label, "Inbox")
     )
   end
-  
+
   defp update_suggestions(socket, add_to) do
     update_suggestions(socket, add_to, socket.assigns.add_to)
   end

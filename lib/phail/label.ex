@@ -1,4 +1,5 @@
 defmodule Phail.Label do
+  import Ecto.Query
   use Ecto.Schema
   alias Phail.Repo
   alias __MODULE__
@@ -14,7 +15,9 @@ defmodule Phail.Label do
   end
 
   def all() do
-    Label |> Repo.all()
+    from(l in Label,
+      order_by: l.name)
+    |> Repo.all()
   end
 
   def get_or_create(label_name) do

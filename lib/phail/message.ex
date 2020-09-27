@@ -1,6 +1,7 @@
 defmodule Phail.Message do
   alias Bamboo.Email
   import Ecto.Query
+  import EctoEnum
   alias Ecto.Changeset
   use Ecto.Schema
   alias Phail.Message
@@ -8,11 +9,13 @@ defmodule Phail.Message do
   alias Phail.Address
   alias Phail.Conversation
 
+  defenum MessageStatus, :message_status, [:draft, :outbox, :sent]
+
   schema "messages" do
     field(:subject, :string)
     field(:body, :string)
     field(:date, :utc_datetime)
-    field(:is_draft, :boolean)
+    field(:status, MessageStatus)
     field(:message_id, :string)
     belongs_to(:conversation, Conversation)
 
@@ -43,12 +46,12 @@ defmodule Phail.Message do
     subject = Keyword.get(options, :subject, "")
     body = Keyword.get(options, :body, "")
     cc = Keyword.get(options, :cc, [])
-    is_draft = Keyword.get(options, :is_draft, false)
+    status = Keyword.get(options, :status)
 
     %Message{
       subject: subject,
       body: body,
-      is_draft: is_draft,
+      status: status,
       to_addresses: [],
       from_addresses: [],
       cc_addresses: [],

@@ -6,7 +6,7 @@ defmodule Phail.Reply do
       original_message.conversation,
       to: original_message.from_addresses,
       subject: subject_with_re_prefix(original_message.subject),
-      is_draft: true
+      status: "draft"
     )
   end
 

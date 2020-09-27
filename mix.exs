@@ -51,7 +51,8 @@ defmodule Phail.MixProject do
       {:combine, "~> 0.5"},
       {:bamboo, "~> 1.5"},
       {:bamboo_smtp, "~> 3.0.0"},
-      { :elixir_uuid, "~> 1.2" }
+      { :elixir_uuid, "~> 1.2" },
+      {:ecto_enum, "~> 1.4"}
     ]
   end
 

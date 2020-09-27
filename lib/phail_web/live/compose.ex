@@ -126,7 +126,7 @@ defmodule PhailWeb.Live.Compose do
       message =
         Message.create(
           Conversation.create("Draft Message"),
-          is_draft: true
+          status: :draft
         )
 
       assign(socket, :message, message)

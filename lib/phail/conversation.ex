@@ -94,7 +94,7 @@ defmodule Phail.Conversation do
 
   defp filter_drafts(conversation_query) do
     conversation_query
-    |> where([_c, m, _l], m.is_draft)
+    |> where([_c, m, _l], m.status == "draft")
   end
 
   # TODO Write a test to check this works.

@@ -32,7 +32,7 @@
         Hidden: <%= MapSet.to_list @hidden %>
       </div>
 
-      <%= if message.is_draft do %>
+      <%= if message.status == :draft do %>
       <%= link "Edit", to: Routes.compose_path(@socket, :message_id, message.id), class: "button" %>
       <button
         phx-click="discard"

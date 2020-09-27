@@ -34,24 +34,20 @@ defmodule PhailWeb.Live.Phail do
     |> noreply
   end
 
+  def handle_params(%{"status" => message_status}, _uri, socket) do
+    socket
+    |> assign(:search_filter, Phail.Query.format_status(message_status))
+    |> assign(:label, nil)
+    |> assign_conversations
+    |> noreply
+  end
+
   def handle_params(%{}, uri, socket) do
     handle_params(%{"label" => "Inbox"}, uri, socket)
   end
 
-  defp get_conversations(%{:label => nil, :search_filter => search_filter}) do
-    Conversation.search(search_filter)
-  end
-
-  defp get_conversations(%{:label => "Drafts"}) do
-    Conversation.select_drafts()
-  end
-
-  defp get_conversations(%{:label => label}) when is_binary(label) do
-    Conversation.select_by_label(label)
-  end
-
   defp assign_conversations(socket) do
-    assign(socket, :conversations, get_conversations(socket.assigns))
+    assign(socket, :conversations, Conversation.search(socket.assigns.search_filter))
   end
 
   def handle_event("update_filter", %{"filter" => filter}, socket) do

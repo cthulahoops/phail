@@ -9,6 +9,22 @@
 
 <div class="side">
   <ul class="label_list">
+    <li>
+      <%= live_patch to: Routes.phail_path(@socket, :label, "Inbox") do %>
+        Inbox
+      <% end %>
+    </li>
+    <li>
+      <%= live_patch to: Routes.phail_path(@socket, :is, :sent) do %>
+        Sent
+      <% end %>
+    </li>
+    <li>
+      <%= live_patch to: Routes.phail_path(@socket, :is, :draft) do %>
+      Drafts
+      <% end %>
+    </li>
+    </li>
     <%= for label <- @labels do %>
       <li>
         <%= live_patch to: Routes.phail_path(@socket, :label, label.name) do %>

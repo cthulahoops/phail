@@ -14,6 +14,7 @@ defmodule ConversationTest do
   describe "Fetch conversations by status" do
     setup do
       sent_conversation = Conversation.create("Test Conversation")
+
       Message.create(
         sent_conversation,
         subject: "Test Message",
@@ -22,6 +23,7 @@ defmodule ConversationTest do
       )
 
       received_conversation = Conversation.create("Not a sent conversation")
+
       Message.create(
         received_conversation,
         subject: "Received!",

@@ -20,6 +20,7 @@ defmodule PhailWeb.Router do
     live "/", Live.Phail
     live "/search/:search_filter/", Live.Phail, :search
     live "/label/:label/", Live.Phail, :label
+    live "/is/:status/", Live.Phail, :is
 
     live "/compose/", Live.Compose
     live "/compose/:message_id/", Live.Compose, :message_id

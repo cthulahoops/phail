@@ -50,12 +50,6 @@ defmodule Phail.Conversation do
     |> Repo.all()
   end
 
-  def select_drafts() do
-    select_conversations()
-    |> filter_message_status(:draft)
-    |> Repo.all()
-  end
-
   defp select_conversations() do
     from c in Conversation,
       join: m in Message,

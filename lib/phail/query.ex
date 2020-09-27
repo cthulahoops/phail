@@ -80,7 +80,11 @@ defmodule Phail.Query do
     "label:" <> quoted_label_name
   end
 
-  defp format_status(status) do
-    "is:" <> Atom.to_string(status)
+  def format_status(status) when is_atom(status) do
+    format_status(Atom.to_string(status))
+  end
+
+  def format_status(status) do
+    "is:" <> status
   end
 end

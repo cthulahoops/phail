@@ -15,3 +15,6 @@ config :phail, PhailWeb.Endpoint,
 
 # Print only warnings and errors during test
 config :logger, level: :warn
+
+config :phail, domain: "phail_test_message"
+config :phail, email_sender: {"Phail Test Account", "phail-test-sender@example.com"}

@@ -1,6 +1,6 @@
 defmodule Phail.Query do
   use Combine
-  defstruct labels: [], text_terms: []
+  defstruct labels: [], text_terms: [], statuses: []
 
   def parse(query_string) do
     query_terms = hd(Combine.parse(query_string, parser()))
@@ -11,6 +11,7 @@ defmodule Phail.Query do
       fn
         {:label, label_name}, query -> %{query | labels: query.labels ++ [label_name]}
         {:text, text}, query -> %{query | text_terms: query.text_terms ++ [text]}
+        {:status, status}, query -> %{query | statuses: query.statuses ++ [status]}
       end
     )
   end
@@ -26,7 +27,7 @@ defmodule Phail.Query do
 
   defp search_term(previous \\ nil) do
     previous
-    |> either(label(), text_term())
+    |> choice([label(), status(), text_term()])
   end
 
   defp text_term(previous \\ nil) do
@@ -45,8 +46,27 @@ defmodule Phail.Query do
     parser |> either(quoted_string(), word())
   end
 
+  defp status(previous \\ nil) do
+    previous
+    |> pair_right(string("is:"), message_status())
+    |> map(fn x -> {:status, String.to_existing_atom(x)} end)
+  end
+
+  defp message_status(previous \\ nil) do
+    previous
+    |> one_of(word(), ["draft", "outbox", "sent"])
+  end
+
   defp quoted_string(parser \\ nil) do
     between(parser, char("\""), word_of(~r/[^"]/), char("\""))
+  end
+
+  def format(query) do
+    Enum.join(
+      Enum.map(query.labels, &format_label/1) ++
+        Enum.map(query.statuses, &format_status/1) ++ query.text_terms,
+      " "
+    )
   end
 
   def format_label(label_name) do
@@ -60,7 +80,7 @@ defmodule Phail.Query do
     "label:" <> quoted_label_name
   end
 
-  def format(query) do
-    Enum.join(Enum.map(query.labels, &format_label/1) ++ query.text_terms, " ")
+  defp format_status(status) do
+    "is:" <> Atom.to_string(status)
   end
 end

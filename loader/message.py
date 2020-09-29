@@ -2,6 +2,7 @@ import email
 import email.utils
 import email.header
 import datetime
+import pytz
 import base64
 import quopri
 import bleach
@@ -34,7 +35,7 @@ def parse_date(datestr):
     date = email.utils.parsedate_tz(datestr)
     tz = SimpleTz(date[-1] or 0)
     date = date[:7] + (tz,)
-    return datetime.datetime(*date)
+    return datetime.datetime(*date).astimezone(pytz.utc)
 
 
 class Message:

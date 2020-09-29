@@ -110,11 +110,13 @@ def insert_message(message, extra_labels=[]):
     cc_addresses = list(map(get_address, message.addresses('cc')))
 
     cursor = dbh.cursor()
-    cursor.execute("insert into messages (subject, body, message_id, date) values (%s, %s, %s, %s) returning (id)", (
+    cursor.execute(
+        "insert into messages (subject, body, message_id, date) values (%s, %s, %s, %s) returning (id)", (
         message.subject,
         message.body,
         message.message_id,
-        message.date,))
+        message.date,
+        ))
     message_id = cursor.fetchone()[0]
 
     for address_id in from_addresses:

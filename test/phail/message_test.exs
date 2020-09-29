@@ -1,5 +1,7 @@
 defmodule MessageTest do
   use ExUnit.Case
+  use Bamboo.Test
+
   alias Phail.Repo
   alias Phail.{Conversation, Message}
 
@@ -25,6 +27,26 @@ defmodule MessageTest do
       Message.set_status(message, :sent)
       message = Message.get(message.id)
       assert message.status == :sent
+    end
+  end
+
+  describe "Message sending" do
+    setup do
+      conversation = Conversation.create("Test Message")
+      message = Message.create(
+            conversation,
+            subject: "Test Message",
+            body: "Some body text for the message"
+          )
+      %{message: message}
+    end
+
+    test "Sending sets message date.", %{message: message} do
+      assert message.date == :nil
+      Message.send(message)
+
+      message = Message.get(message.id)
+      assert message.date != :nil
     end
   end
 end

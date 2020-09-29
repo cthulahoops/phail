@@ -133,6 +133,14 @@ defmodule Phail.Message do
   end
 
   def send(message) do
+    utc_datetime = DateTime.utc_now()
+
+    message
+    |> Changeset.cast(%{"date" => utc_datetime}, [:date])
+    |> Repo.update!()
+
+    local_datetime = Calendar.DateTime.shift_zone!(utc_datetime, "Europe/London")
+
     email =
       Email.new_email(
         from: Application.fetch_env!(:phail, :email_sender),
@@ -140,7 +148,8 @@ defmodule Phail.Message do
         subject: message.subject,
         html_body: message.body,
         headers: [
-          {"Message-Id", message.message_id}
+          {"Message-Id", message.message_id},
+          {"Date", Calendar.DateTime.Format.rfc2822(local_datetime)}
         ]
       )
 

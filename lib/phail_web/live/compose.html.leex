@@ -19,9 +19,9 @@
   </li>
   <li>
     <label for="subject">Subject</label>
-    <input name="subject" id="to" type=text value="<%= @message.subject %>">
+    <input name="subject" id="to" type=text value="<%= @message.subject %>" phx-debounce="15000">
   </li>
-  <li><label for="body">Body</label><textarea id="body" name="body"><%= @message.body %></textarea></li>
+  <li><label for="body">Body</label><textarea id="body" name="body" phx-debounce="15000"><%= @message.body %></textarea></li>
 
 
   <input type="submit" name=send value="Send">

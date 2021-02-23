@@ -2,49 +2,56 @@
   <%= for message <- @conversation.messages do %>
   <div class=message>
     <ul
-      phx-click="toggle_hide"
+      not-phx-click="toggle_hide"
       phx-value-message-id="<%= message.id %>"
       phx-target="<%= @myself %>"
-      id="banana">
+      class="message_header">
     <li>
-    From: <%= PhailView.address_list message.from_addresses %>
+      <span class="message_header_key">From</span>
+      <span class="message_header_value"><%= PhailView.address_list message.from_addresses %></span>
     </li>
     <%= if hidden?(@hidden, message.id) do %>
       </ul>
     <% else %>
       <li>
-        To: <%= PhailView.address_list message.to_addresses %>
+        <span class="message_header_key">To</span>
+        <span class="message_header_value"><%= PhailView.address_list message.to_addresses %></span>
       </li>
       <%= if message.cc_addresses != [] do %>
       <li>
-      Cc: <%= PhailView.address_list message.cc_addresses %>
+        <span class="message_header_key">Cc</span>
+        <span class="message_header_value"><%= PhailView.address_list message.cc_addresses %></span>
       </li>
       <% end %>
       <li>
-        Subject: <%= message.subject %>
+        <span class="message_header_key">Subject</span>
+        <span class="message_header_value"><%= message.subject %></span>
       </li>
       <li>
-      Date: <%= message.date %>
+        <span class="message_header_key">Date</span>
+        <span class="message_header_value"><%= message.date %></span>
       </li>
       </ul>
 
       <div>
-        Hidden: <%= MapSet.to_list @hidden %>
+        <%= MapSet.to_list @hidden %>
+      </div>
+      <div class=body>
+      <%= raw message.body %>
       </div>
 
       <%= if message.status == :draft do %>
       <%= link "Edit", to: Routes.compose_path(@socket, :message_id, message.id), class: "button" %>
-      <button
+      <a
+        class='button'
         phx-click="discard"
         phx-event="discard"
         phx-value-message_id="<%= message.id %>"
-        >Discard</button>
+        >Discard</a>
       <% else %>
       <%= link "Reply", to: Routes.compose_path(@socket, :reply_to, message.id), class: "button" %>
       <% end %>
-      <div class=body>
-      <%= raw message.body %>
-      </div>
+
     <% end %>
   </div>
   <% end %>

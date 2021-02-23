@@ -110,10 +110,12 @@ main.container {
 ul.comma_separated {
   display: inline;
   list-style: none;
+  padding-inline-start: 0;
 }
 
 ul.comma_separated li {
   display: inline;
+  font-size: 100%;
 }
 
 ul.comma_separated li::after {
@@ -162,7 +164,7 @@ span.conversation_label {
 
 .grid {
   display: grid;
-  grid-template-columns: 20% 80%;
+  grid-template-columns: 15% 85%;
   grid-template-areas:
     "head head"
     "side main";
@@ -202,3 +204,71 @@ ul.autocomplete li:hover {
 .form_items {
   list-style: none;
 }
+
+.message_header {
+  list-style: none;
+  padding: 15px 10px;
+  border-bottom: 1px solid #A577B5;
+  margin-bottom: 10px
+  
+}
+
+.message_header > li {
+  display: grid;
+  grid-template-columns: 1fr 10fr;
+  grid-gap: 10px;
+  grid-template-areas: "key value";
+  padding: 5px;
+  font-size: 0.9em;
+}
+
+.message_header_key {
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  color: #606060;
+  font-size: 0.9em;
+  grid-area: key;
+}
+.message_header_value {
+  grid-area: value;
+}
+
+.button {
+  background-color: #A577B5;
+  color: #fff;
+  text-decoration: none;
+  padding: 6px 15px;
+  border-radius: 0.3em;
+  display: inline-block;
+  cursor: pointer;
+}
+
+.conversation_buttons {
+  margin: 15px 5px;
+}
+
+.navigation-list {
+ list-style: none;
+ padding: 0;
+}
+
+.navigation-list li {
+ padding: 4px 20px;
+ font-size: 1.1em;
+ 
+}
+
+.navigation-list li a {
+   text-decoration: none;
+   color: #A577B5;
+}
+
+.navigation-list li:hover {
+   background-color: #A577B5;
+   
+}
+
+.navigation-list li:hover a {
+  color: white;
+}
+

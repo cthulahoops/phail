@@ -8,7 +8,7 @@
 </div>
 
 <div class="side">
-  <ul class="label_list">
+  <ul class="navigation-list">
     <li>
       <%= live_patch to: Routes.phail_path(@socket, :label, "Inbox") do %>
         Inbox
@@ -52,30 +52,36 @@
       <%= if !is_nil(@expanded) && conversation.id == @expanded.id do %>
       <div class="conversation_buttons">
         <%= if @label != 'Inbox' do %>
-          <button
+          <a
+            class="button"
             phx-click="move"
             phx-value-id="<%= conversation.id %>"
-            phx-value-target="Archived">Archive</button>
+            phx-value-target="Archived">Archive</a>
         <% end %>
         <%= if @label == "Inbox" do %>
-          <button
+          <a
+            class="button"
             phx-click="move"
             phx-value-id="<%= conversation.id %>"
-            phx-value-target="Reply Later">Reply Later</button>
+            phx-value-target="Reply Later">Reply Later</a>
         <% end %>
-        <button
+        <a
+          class='button'
           phx-click="move"
           phx-value-id="<%= conversation.id %>"
-          phx-value-target="Spam">Spam</button>
-        <button
+          phx-value-target="Spam"
+          >Spam</a>
+        <a
+          class='button'
           phx-click="move"
           phx-value-id="<%= conversation.id %>"
-          phx-value-target="Bin">Delete</button>
+          phx-value-target="Bin">Delete</a>
         <%= if @label != "Inbox" do %>
-        <button
+        <a
+          class='button'
           phx-click="move"
           phx-value-id="<%= conversation.id %>"
-          phx-value-target="Inbox">Move to Inbox</button>
+          phx-value-target="Inbox">Move to Inbox</a>
         <% end %>
       </div>
       <%= live_component(@socket, PhailWeb.Live.Conversation, id: @expanded.id, conversation: @expanded) %>

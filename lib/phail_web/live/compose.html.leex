@@ -24,9 +24,9 @@
   <li><label for="body">Body</label><textarea id="body" name="body" phx-debounce="15000"><%= @message.body %></textarea></li>
 
 
-  <input type="submit" name=send value="Send">
-  <button phx-click="close">Close</button>
-  <button phx-click="discard_and_close">Discard</button>
+  <input class="button" type="submit" name=send value="Send">
+  <a class="button" phx-click="close">Close</a>
+  <a class="button" phx-click="discard_and_close">Discard</a>
 </ul>
 </form>
 

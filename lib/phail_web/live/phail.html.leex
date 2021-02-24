@@ -1,10 +1,13 @@
 <div class="grid">
 <div class="header">
-  <form phx-submit="update_filter">
+  <div class="header-item">
+    <%= link "Compose", to: Routes.live_path(@socket, PhailWeb.Live.Compose), class: "button" %>
+  </div>
+
+  <form class="header-item" phx-submit="update_filter">
     <input name=filter placeholder="Search mail..." value="<%= @search_filter %>"</input>
   </form>
 
-  <%= link "Compose", to: Routes.live_path(@socket, PhailWeb.Live.Compose), class: "button" %>
 </div>
 
 <div class="side">

@@ -5,31 +5,31 @@
       not-phx-click="toggle_hide"
       phx-value-message-id="<%= message.id %>"
       phx-target="<%= @myself %>"
-      class="message_header">
+      class="message-header">
     <li>
-      <span class="message_header_key">From</span>
-      <span class="message_header_value"><%= PhailView.address_list message.from_addresses %></span>
+      <span class="message-header-key">From</span>
+      <span class="message-header-value"><%= PhailView.address_list message.from_addresses %></span>
     </li>
     <%= if hidden?(@hidden, message.id) do %>
       </ul>
     <% else %>
       <li>
-        <span class="message_header_key">To</span>
-        <span class="message_header_value"><%= PhailView.address_list message.to_addresses %></span>
+        <span class="message-header-key">To</span>
+        <span class="message-header-value"><%= PhailView.address_list message.to_addresses %></span>
       </li>
       <%= if message.cc_addresses != [] do %>
       <li>
-        <span class="message_header_key">Cc</span>
-        <span class="message_header_value"><%= PhailView.address_list message.cc_addresses %></span>
+        <span class="message-header-key">Cc</span>
+        <span class="message-header-value"><%= PhailView.address_list message.cc_addresses %></span>
       </li>
       <% end %>
       <li>
-        <span class="message_header_key">Subject</span>
-        <span class="message_header_value"><%= message.subject %></span>
+        <span class="message-header-key">Subject</span>
+        <span class="message-header-value"><%= message.subject %></span>
       </li>
       <li>
-        <span class="message_header_key">Date</span>
-        <span class="message_header_value"><%= message.date %></span>
+        <span class="message-header-key">Date</span>
+        <span class="message-header-value"><%= message.date %></span>
       </li>
       </ul>
 

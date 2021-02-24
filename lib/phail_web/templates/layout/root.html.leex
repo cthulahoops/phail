@@ -10,7 +10,10 @@
     <script defer phx-track-static type="text/javascript" src="<%= Routes.static_path(@conn, "/js/app.js") %>"></script>
   </head>
   <body>
-    <header>
+    <%= @inner_content %>
+
+    <hr/>
+    <footer>
       <section class="container">
         <nav role="navigation">
           <ul>
@@ -20,11 +23,7 @@
             <% end %>
           </ul>
         </nav>
-        <h1 style="margin-top: 1em;">
-          <a href="/">Phail Mail</a>
-        </h1>
       </section>
-    </header>
-    <%= @inner_content %>
+    </footer>
   </body>
 </html>

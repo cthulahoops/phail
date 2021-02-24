@@ -86,10 +86,19 @@ defmodule Phail.Message do
   end
 
   def update_draft(message, mail_data \\ %{}) do
-    message
+    message = message
     |> Changeset.change()
     |> Changeset.cast(mail_data, [:subject, :body])
     |> Repo.update!()
+
+    if message.conversation.is_draft do
+      message.conversation
+      |> Changeset.change()
+      |> Changeset.cast(mail_data, [:subject])
+      |> Repo.update!()
+    end
+
+    message
   end
 
   defp text_search(search_term) do
@@ -153,7 +162,12 @@ defmodule Phail.Message do
         ]
       )
 
+    message.conversation
+    |> Changeset.cast(%{"is_draft" => false}, [:is_draft])
+    |> Repo.update!()
+
     set_status(message, :outbox)
+
     Phail.Mailer.deliver_now(email)
     set_status(message, :sent)
   end

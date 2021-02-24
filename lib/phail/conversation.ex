@@ -10,6 +10,7 @@ defmodule Phail.Conversation do
   schema "conversations" do
     field :subject, :string
     field :date, :utc_datetime, virtual: true
+    field :is_draft, :boolean
 
     has_many(:messages, Message)
     many_to_many(:from_addresses, Address, join_through: "conversation_from_address")
@@ -25,7 +26,8 @@ defmodule Phail.Conversation do
 
   def create(subject) do
     %Conversation{
-      subject: subject
+      subject: subject,
+      is_draft: true
     }
     |> Repo.insert!()
   end

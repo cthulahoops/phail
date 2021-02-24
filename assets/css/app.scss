@@ -94,10 +94,11 @@
 
 :root {
   --main-color: #a577b5;
+  --darker-color: #391249;
 }
 
 body {
-  background: #eeeeee;
+  background: #EBE6DD;
 }
 
 main.container {
@@ -108,28 +109,30 @@ main.container {
   list-style: none;
 }
 
-.conversation_header ul.sender_list {
-  display: inline-block;
-  width: 30%;
+.conversation-header {
+  ul.sender-list {
+    display: inline-block;
+    width: 20%;
+  }
 }
 
-ul.comma_separated {
+ul.comma-separated {
   display: inline;
   list-style: none;
   padding-inline-start: 0;
-}
 
-ul.comma_separated li {
-  display: inline;
-  font-size: 100%;
-}
+  li {
+    display: inline;
+    font-size: 100%;
+  }
 
-ul.comma_separated li::after {
-  content: ", ";
-}
+  li::after {
+    content: ", ";
+  }
 
-ul.comma_separated li:last-child::after {
-  content: "";
+  li:last-child::after {
+    content: "";
+  }
 }
 
 .conversation .subject {
@@ -156,14 +159,15 @@ ul.comma_separated li:last-child::after {
   width: 80%;
 }
 
-.body {
+.message-body {
   padding: 1em;
 }
 
-span.conversation_label {
-  size: 0.6em;
+span.conversation-label {
+  display: inline-block;
   padding: 0.3em;
   border: 1px solid black;
+  font-size: 0.7em;
   border-radius: 0.5em;
   background-color: var(--main-color);
 }
@@ -171,13 +175,24 @@ span.conversation_label {
 .grid {
   display: grid;
   grid-template-columns: 15% 85%;
+  grid-gap: 1em;
   grid-template-areas:
-    "head head"
+    "head search"
     "side main";
 }
 
 .header {
   grid-area: head;
+  font-size: 1.2em;
+}
+
+.search {
+  form {
+    padding: 0;
+  }
+  padding: 0;
+  grid-area: search;
+  font-size: 1.2em;
 }
 
 .side {
@@ -186,29 +201,44 @@ span.conversation_label {
 
 .main {
   grid-area: main;
+  background-color: white;
 }
 
-ul.autocomplete {
+.autocomplete {
+  position: relative;
+  display: inline-block;
+
+  > ul {
+    position: absolute;
+    padding: 0;
+    list-style: none;
+    border: 1px solid var(--main-color);
+    z-index: 1;
+    background: white;
+    margin: 0;
+
+    top: 100%;
+    left: 0;
+
+    > li {
+      display: hover;
+      margin: 0px;
+      padding: 10px;
+    }
+    > li:hover {
+      background-color: var(--main-color);
+      color: white;
+    }
+  }
+}
+
+.form-items {
   list-style: none;
-  position: absolute;
-  border: 1px solid #a577b5;
-  z-index: 1;
-  background: white;
-  margin: 0;
-}
 
-ul.autocomplete li {
-  display: hover;
-  margin: 0px;
-  padding: 10px;
-}
-
-ul.autocomplete li:hover {
-  background-color: var(--main-color);
-}
-
-.form_items {
-  list-style: none;
+  > li {
+    padding: 0.5em;
+    display: grid;
+  }
 }
 
 .message-header {
@@ -261,7 +291,7 @@ ul.autocomplete li:hover {
      display: inline-block;
      text-decoration: none;
      padding: 4px 20px;
-     color: var(--main-color);
+     color: var(--darker-color);
      width: 100%;
     }
   }

@@ -1,27 +1,29 @@
 <form phx-submit="submit" phx-change="change">
-<ul class=form_items>
+<ul class=form-items>
   <li><label for="to">To</label>
-    <ul>
+    <ul class="comma-separated">
     <%= for to <- @message.to_addresses do %>
-      <li><%= PhailView.format_address to %><a phx-click="remove_to_address" phx-value-id="<%= to.id %>">Remove</a></li>
+      <li><%= PhailView.format_address to %><a class="button" phx-click="remove_to_address" phx-value-id="<%= to.id %>">Remove</a></li>
     <% end %>
     </ul>
-    <input name="add_to" id="to" type=text>
-    <%= if @suggestions != [] do %>
-      <ul class=autocomplete>
-      <%= for suggestion <- @suggestions do %>
-        <li phx-click="add_to" phx-value-id="<%= suggestion.id %>">
-          <%= PhailView.format_address suggestion %>
-        </li>
+    <div class="autocomplete">
+      <input name="add_to" id="to" type=text>
+      <%= if @suggestions != [] do %>
+        <ul class=autocomplete>
+        <%= for suggestion <- @suggestions do %>
+          <li phx-click="add_to" phx-value-id="<%= suggestion.id %>">
+            <%= PhailView.format_address suggestion %>
+          </li>
+        <% end %>
+        </ul>
       <% end %>
-      </ul>
-    <% end %>
+    </div>
   </li>
   <li>
     <label for="subject">Subject</label>
     <input name="subject" id="to" type=text value="<%= @message.subject %>" phx-debounce="15000">
   </li>
-  <li><label for="body">Body</label><textarea id="body" name="body" phx-debounce="15000"><%= @message.body %></textarea></li>
+  <li><label for="body">Body</label><textarea id="body" name="body" cols=80 rows=25 phx-debounce="15000"><%= @message.body %></textarea></li>
 
 
   <input class="button" type="submit" name=send value="Send">

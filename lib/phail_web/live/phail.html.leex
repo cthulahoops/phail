@@ -3,11 +3,12 @@
   <div class="header-item">
     <%= link "Compose", to: Routes.live_path(@socket, PhailWeb.Live.Compose), class: "button" %>
   </div>
+</div>
 
+<div class="search">
   <form class="header-item" phx-submit="update_filter">
     <input name=filter placeholder="Search mail..." value="<%= @search_filter %>"</input>
   </form>
-
 </div>
 
 <div class="side">
@@ -43,11 +44,11 @@
   <ul class=mailbox>
   <%= for conversation <- @conversations do %>
     <li class="conversation">
-      <div class="conversation_header" phx-value-id="<%= conversation.id %>" phx-click="expand">
+      <div class="conversation-header" phx-value-id="<%= conversation.id %>" phx-click="expand">
         <%= PhailView.name_list conversation.from_addresses %>
         <span class=subject>
           <%= for label <- conversation.labels do %>
-            <span class="conversation_label"><%= label.name %></span>
+            <span class="conversation-label"><%= label.name %></span>
           <% end %>
           <%= conversation.subject %></span>
         <span class=date><%= conversation.date %></span>

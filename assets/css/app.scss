@@ -90,6 +90,12 @@
   display: none;
 }
 
+/* My CSS! */
+
+:root {
+  --main-color: #a577b5;
+}
+
 body {
   background: #eeeeee;
 }
@@ -136,7 +142,7 @@ ul.comma_separated li:last-child::after {
 
 .conversation {
   display: block;
-  border-top: 1px solid #a577b5;
+  border-top: 1px solid var(--main-color);
   margin: 0;
   padding: 0.2em;
   text: red;
@@ -159,7 +165,7 @@ span.conversation_label {
   padding: 0.3em;
   border: 1px solid black;
   border-radius: 0.5em;
-  background-color: #ffffaa;
+  background-color: var(--main-color);
 }
 
 .grid {
@@ -198,22 +204,21 @@ ul.autocomplete li {
 }
 
 ul.autocomplete li:hover {
-  background-color: #a577b5;
+  background-color: var(--main-color);
 }
 
 .form_items {
   list-style: none;
 }
 
-.message_header {
+.message-header {
   list-style: none;
   padding: 15px 10px;
-  border-bottom: 1px solid #A577B5;
+  border-bottom: 1px solid var(--main-color);
   margin-bottom: 10px
-  
 }
 
-.message_header > li {
+.message-header > li {
   display: grid;
   grid-template-columns: 1fr 10fr;
   grid-gap: 10px;
@@ -222,19 +227,19 @@ ul.autocomplete li:hover {
   font-size: 0.9em;
 }
 
-.message_header_key {
+.message-header-key {
   text-transform: uppercase;
   letter-spacing: 1px;
   color: #606060;
   font-size: 0.9em;
   grid-area: key;
 }
-.message_header_value {
+.message-header-value {
   grid-area: value;
 }
 
 .button {
-  background-color: #A577B5;
+  background-color: var(--main-color);
   color: #fff;
   text-decoration: none;
   padding: 6px 15px;
@@ -250,25 +255,26 @@ ul.autocomplete li:hover {
 .navigation-list {
  list-style: none;
  padding: 0;
+ li {
+   font-size: 1.1em;
+   a {
+     display: inline-block;
+     text-decoration: none;
+     padding: 4px 20px;
+     color: var(--main-color);
+     width: 100%;
+    }
+  }
+
+  li:hover {
+   background-color: var(--main-color);
+   a {
+     color: white;
+    }
+  }
 }
 
-.navigation-list li {
- padding: 4px 20px;
- font-size: 1.1em;
- 
+.header-item {
+  float: left;
+  padding: 0 1em;
 }
-
-.navigation-list li a {
-   text-decoration: none;
-   color: #A577B5;
-}
-
-.navigation-list li:hover {
-   background-color: #A577B5;
-   
-}
-
-.navigation-list li:hover a {
-  color: white;
-}
-

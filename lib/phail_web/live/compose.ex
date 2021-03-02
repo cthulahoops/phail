@@ -19,6 +19,7 @@ defmodule PhailWeb.Live.Compose do
     |> assign(:conversation, Conversation.get(message.conversation.id))
     |> assign(:add_to, "")
     |> assign(:suggestions, [])
+    |> assign(:add_to_index, 0)
     |> ok
   end
 
@@ -90,10 +91,44 @@ defmodule PhailWeb.Live.Compose do
   end
 
   def handle_event("submit", _mail_data, socket) do
-    Message.send(socket.assigns.message)
+    # Message.send(socket.assigns.message)
 
     socket
     |> close
+    |> noreply
+  end
+
+  def handle_event("handle_keydown", %{"key" => key, "value" => _}, socket) do
+    IO.puts(key)
+    old_index = socket.assigns.add_to_index
+
+    new_index =
+      case key do
+        "ArrowDown" ->
+          if old_index < length(socket.assigns.suggestions) - 1 do
+            old_index + 1
+          else
+            old_index
+          end
+
+        "ArrowUp" ->
+          if old_index > 0 do
+            old_index - 1
+          else
+            old_index
+          end
+
+        "Enter" ->
+          old_index = 0
+
+        _ ->
+          old_index
+      end
+
+    IO.inspect(new_index)
+
+    socket
+    |> assign(:add_to_index, new_index)
     |> noreply
   end
 

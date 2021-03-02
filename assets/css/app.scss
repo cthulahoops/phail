@@ -225,7 +225,7 @@ span.conversation-label {
       margin: 0px;
       padding: 10px;
     }
-    > li:hover {
+    > li:hover, .active-suggestion {
       background-color: var(--main-color);
       color: white;
     }

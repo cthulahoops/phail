@@ -204,6 +204,8 @@ def content(mail):
                 "tbody",
                 "thead",
                 "img",
+                "u",
+                "pre",
             ],
             attributes={
                 "a": ["href", "title"],

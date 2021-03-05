@@ -78,6 +78,12 @@ defmodule PhailWeb.Live.Compose do
     |> noreply
   end
 
+  def handle_event("add_to", %{"address" => address}, socket) do
+    socket
+    |> add_to_address(Address.get_or_create(%{address: address, name: ""}))
+    |> noreply
+  end
+
   def handle_event("remove_to_address", %{"id" => id}, socket) do
     to_address = Address.get(id)
 
@@ -91,6 +97,12 @@ defmodule PhailWeb.Live.Compose do
 
     socket
     |> close
+    |> noreply
+  end
+
+  def handle_event("clear_suggestions", %{}, socket) do
+    socket
+    |> clear_suggestions
     |> noreply
   end
 

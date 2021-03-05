@@ -18,8 +18,7 @@ defmodule PhailWeb.Live.Compose do
     |> assign(:message, message)
     |> assign(:conversation, Conversation.get(message.conversation.id))
     |> assign(:add_to, "")
-    |> assign(:suggestions, [])
-    |> assign(:add_to_index, 0)
+    |> clear_suggestions
     |> ok
   end
 
@@ -29,7 +28,7 @@ defmodule PhailWeb.Live.Compose do
     socket
     |> assign(:reply_to, reply_to)
     |> new_reply(reply_to)
-    |> assign(:suggestions, [])
+    |> clear_suggestions
     |> ok
   end
 
@@ -43,7 +42,7 @@ defmodule PhailWeb.Live.Compose do
     })
     |> assign(:conversation, nil)
     |> assign(:add_to, "")
-    |> assign(:suggestions, [])
+    |> clear_suggestions
     |> ok
   end
 
@@ -74,11 +73,8 @@ defmodule PhailWeb.Live.Compose do
   end
 
   def handle_event("add_to", %{"id" => id}, socket) do
-    to_address = Address.get(id)
-
     socket
-    |> update_message(fn message -> Message.add_to_address(message, to_address) end)
-    |> update_suggestions("")
+    |> add_to_address(Address.get(id))
     |> noreply
   end
 
@@ -98,32 +94,29 @@ defmodule PhailWeb.Live.Compose do
     |> noreply
   end
 
-  def handle_event("handle_keydown", %{"key" => key, "value" => _}, socket) do
+
+  def handle_event("handle_keydown", %{"key" => "Enter"}, socket) do
+    socket
+    |> add_to_address(Enum.fetch!(socket.assigns.suggestions, socket.assigns.add_to_index))
+    |> noreply
+  end
+
+  def handle_event("handle_keydown", %{"key" => "Escape"}, socket) do
+    clear_suggestions(socket)
+    |> noreply
+  end
+
+  def handle_event("handle_keydown", %{"key" => key}, socket) do
     IO.puts(key)
     old_index = socket.assigns.add_to_index
 
-    new_index =
-      case key do
-        "ArrowDown" ->
-          if old_index < length(socket.assigns.suggestions) - 1 do
-            old_index + 1
-          else
-            old_index
-          end
-
-        "ArrowUp" ->
-          if old_index > 0 do
-            old_index - 1
-          else
-            old_index
-          end
-
-        "Enter" ->
-          old_index = 0
-
-        _ ->
-          old_index
+    new_index = case key do
+        "ArrowDown" -> old_index + 1
+        "ArrowUp" -> old_index - 1
+        _ -> old_index
       end
+
+    new_index = clamp(new_index, 0, length(socket.assigns.suggestions) - 1)
 
     IO.inspect(new_index)
 
@@ -131,6 +124,10 @@ defmodule PhailWeb.Live.Compose do
     |> assign(:add_to_index, new_index)
     |> noreply
   end
+
+  defp clamp(x, min, _max) when x < min, do: min
+  defp clamp(x, _min, max) when x > max, do: max
+  defp clamp(x, _min, _max), do: x
 
   defp close(socket) do
     push_redirect(socket,
@@ -156,6 +153,20 @@ defmodule PhailWeb.Live.Compose do
     socket
     |> assign(:suggestions, Address.prefix_search(add_to))
     |> assign(:add_to, add_to)
+  end
+
+  defp clear_suggestions(socket) do
+    socket
+    |> assign(:suggestions, [])
+    |> assign(:add_to_index, 0)
+  end
+
+  defp add_to_address(socket, to_address) do
+    socket
+    |> update_message(fn message -> Message.add_to_address(message, to_address) end)
+    |> assign(:add_to, "")
+    |> update_suggestions("")
+    |> clear_suggestions
   end
 
   defp ensure_message(socket) do

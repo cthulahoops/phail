@@ -94,41 +94,6 @@ defmodule PhailWeb.Live.Compose do
     |> noreply
   end
 
-
-  def handle_event("handle_keydown", %{"key" => "Enter"}, socket) do
-    socket
-    |> add_to_address(Enum.fetch!(socket.assigns.suggestions, socket.assigns.add_to_index))
-    |> noreply
-  end
-
-  def handle_event("handle_keydown", %{"key" => "Escape"}, socket) do
-    clear_suggestions(socket)
-    |> noreply
-  end
-
-  def handle_event("handle_keydown", %{"key" => key}, socket) do
-    IO.puts(key)
-    old_index = socket.assigns.add_to_index
-
-    new_index = case key do
-        "ArrowDown" -> old_index + 1
-        "ArrowUp" -> old_index - 1
-        _ -> old_index
-      end
-
-    new_index = clamp(new_index, 0, length(socket.assigns.suggestions) - 1)
-
-    IO.inspect(new_index)
-
-    socket
-    |> assign(:add_to_index, new_index)
-    |> noreply
-  end
-
-  defp clamp(x, min, _max) when x < min, do: min
-  defp clamp(x, _min, max) when x > max, do: max
-  defp clamp(x, _min, _max), do: x
-
   defp close(socket) do
     push_redirect(socket,
       to: Routes.phail_path(socket, :label, "Inbox")
@@ -158,7 +123,6 @@ defmodule PhailWeb.Live.Compose do
   defp clear_suggestions(socket) do
     socket
     |> assign(:suggestions, [])
-    |> assign(:add_to_index, 0)
   end
 
   defp add_to_address(socket, to_address) do

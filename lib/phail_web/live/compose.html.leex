@@ -3,16 +3,16 @@
 <form phx-submit="submit" phx-change="change">
 <ul class=form-items>
   <li><label for="to">To</label>
-    <div class="address-input">
+    <div class="address-input input">
     <%= for to <- @message.to_addresses do %>
       <div class="message-recipient" title="<%= PhailView.format_address to %>"><%= PhailView.address_name to %><a class="button" phx-click="remove_to_address" phx-value-id="<%= to.id %>">X</a></div>
     <% end %>
       <div class="autocomplete">
-        <input name="add_to" id="to" type=text autocomplete="off" phx-keydown="handle_keydown">
+        <input name="add_to" id="to" type=text autocomplete="off" phx-hook="AddressInput">
         <%= if @suggestions != [] do %>
-          <ul class=autocomplete>
+          <ul id="to-address-container" class=autocomplete>
           <%= for {suggestion, idx} <- Enum.with_index(@suggestions) do %>
-            <li phx-click="add_to" <%= if idx == @add_to_index do %>class="active-suggestion"<% end %> phx-value-id="<%= suggestion.id %>">
+            <li phx-hook="AddressSuggestion" id="suggestion-<%= suggestion.id %>" phx-value-id="<%= suggestion.id %>">
               <%= PhailView.format_address suggestion %>
             </li>
           <% end %>
@@ -23,7 +23,7 @@
   </li>
   <li>
     <label for="subject">Subject</label>
-    <input name="subject" id="subject" type=text value="<%= @message.subject %>" phx-debounce="15000">
+    <input name="subject" class="input" id="subject" type=text value="<%= @message.subject %>" phx-debounce="15000">
   </li>
   <li><label for="body">Body</label><textarea id="body" name="body" cols=80 rows=25 phx-debounce="15000"><%= @message.body %></textarea></li>
 
@@ -37,11 +37,3 @@
 <%= if !is_nil(@conversation) do %>
     <%= live_component(@socket, PhailWeb.Live.Conversation, id: @conversation.id, conversation: @conversation) %>
 <% end %>
-
-<script>
-  document.getElementById("to").addEventListener("keydown", function(event) {
-    if (event.key === "ArrowUp" || event.key == "Enter" || event.key == "ArrowDown") {
-      event.preventDefault();
-    }
-  })
-</script>

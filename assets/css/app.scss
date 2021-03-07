@@ -252,8 +252,8 @@ span.conversation-label {
     top: 100%;
     left: 0;
 
-    > li {
-      display: hover;
+    > multi-input-suggestion {
+      display: block;
       margin: 0px;
       padding: 10px;
     }

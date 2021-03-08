@@ -27,7 +27,6 @@ class MultiInput extends HTMLElement {
 
   connectedCallback () {
     this.addEventListener('keydown', (event) => {
-      console.log(event.keyCode, event.key)
       const input = event.originalTarget
       let detail
       switch (event.key) {
@@ -47,6 +46,7 @@ class MultiInput extends HTMLElement {
           if (this.activeElement === null) {
             detail = { address: input.value }
           } else {
+            // TODO - this is buggy and fails.
             console.log('Active: ', this.activeElement, this.activeIndex)
             detail = { id: this.activeElement.suggestionId }
           }
@@ -79,8 +79,8 @@ class MultiInput extends HTMLElement {
       }
       event.preventDefault()
     })
+
     this.addEventListener('suggestionMouseOver', (event) => {
-      console.log(event.originalTarget, event.originalTarget.index)
       this.activeIndex = event.originalTarget.index
     })
 
@@ -92,7 +92,6 @@ class MultiInput extends HTMLElement {
 
     this.querySelector('input').addEventListener('blur', event => {
       setTimeout(() => {
-        console.log('Clearing suggestions.')
         this.dispatchEvent(new CustomEvent('clearSuggestions'))
       }, 100)
     })
@@ -103,7 +102,6 @@ class MultiInput extends HTMLElement {
   }
 
   set activeIndex (newIndex) {
-    console.log('Set active: ', newIndex)
     const container = this.querySelector('.autocomplete_suggestions')
     if (newIndex >= container.children.length) {
       newIndex = container.children.length - 1
@@ -134,10 +132,7 @@ customElements.define('multi-input', MultiInput)
 
 class MultiInputSuggestion extends HTMLElement {
   connectedCallback () {
-    console.log('Connected callback.')
-
     this.addEventListener('mouseover', event => {
-      console.log('Mouse!')
       this.dispatchEvent(new CustomEvent('suggestionMouseOver', {
         bubbles: true
       }))
@@ -158,7 +153,6 @@ class MultiInputSuggestion extends HTMLElement {
   }
 
   get index () {
-    console.log('This: ', this)
     return parseInt(this.attributes.index.value)
   }
 

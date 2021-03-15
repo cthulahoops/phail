@@ -22,6 +22,7 @@ import 'alpinejs'
 window.multiInput = () => {
   return {
     active: 0,
+    showSuggestions: true,
     setActive (newActive) {
       if (!this.$refs.suggestions) {
         newActive = 0
@@ -86,7 +87,9 @@ window.multiInput = () => {
       '@keydown.tab.prevent': 'addItem($dispatch)',
       '@keydown.enter.prevent': 'addItem($dispatch)',
       '@keydown.backspace': 'backspace($event, $dispatch)',
-      '@keydown.escape.prevent': '$dispatch("clear_suggestions")'
+      '@keydown.escape.prevent': '$dispatch("clear_suggestions")',
+      '@click.away': 'showSuggestions = false',
+      '@focus': 'showSuggestions = true'
     },
 
     suggestion: (index) => {

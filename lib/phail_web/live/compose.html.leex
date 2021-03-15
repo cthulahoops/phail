@@ -16,7 +16,7 @@
           x-ref="inputElement"
           >
         <%= if @suggestions != [] do %>
-          <ul x-ref="suggestions" class="autocomplete_suggestions">
+          <ul x-ref="suggestions" x-show.transition="showSuggestions" class="autocomplete_suggestions">
           <%= for {suggestion, idx} <- Enum.with_index(@suggestions) do %>
             <li id="suggestion-<%= suggestion.id %>" x-spread="suggestion( <%= idx %> )" suggestion-id="<%= suggestion.id %>">
               <%= PhailView.format_address suggestion %>

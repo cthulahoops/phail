@@ -17,172 +17,122 @@ import { Socket } from 'phoenix'
 import NProgress from 'nprogress'
 import { LiveSocket } from 'phoenix_live_view'
 
-/* global HTMLElement, CustomEvent, customElements */
+import 'alpinejs'
 
-class MultiInput extends HTMLElement {
-  constructor () {
-    super()
-    this._activeIndex = 0
-  }
+window.multiInput = () => {
+  return {
+    active: 0,
+    setActive (newActive) {
+      if (!this.$refs.suggestions) {
+        newActive = 0
+      } else if (newActive < 0) {
+        newActive = 0
+      } else if (newActive >= this.$refs.suggestions.children.length) {
+        newActive = this.$refs.suggestions.children.length - 1
+      }
+      console.log('Active: ', this.active, newActive)
+      this.active = newActive
+    },
+    activeSuggestion () {
+      console.log('Refs: ', this.$refs, this.$refs.suggestions)
+      if (this.$refs.suggestions) {
+        return this.$refs.suggestions.children[this.active]
+      } else {
+        return null
+      }
+    },
+    dispatch (eventName, data) {
+      console.log('Dispatch', eventName, data, this.$refs)
+    },
 
-  connectedCallback () {
-    this.addEventListener('keydown', (event) => {
-      const input = event.originalTarget
+    addItem (dispatch) {
+      const input = this.$refs.inputElement
+      if (input.value === '') {
+        return
+      }
+
+      const activeSuggestion = this.activeSuggestion()
+      console.log('Active suggestion: ', this.activeSuggestion())
+
       let detail
-      switch (event.key) {
-        case 'ArrowDown':
-          this.activeIndex += 1
-          break
-        case 'ArrowUp':
-          this.activeIndex -= 1
-          break
-        case 'Tab':
-        case 'Enter':
-          event.preventDefault()
-          if (input.value === '') {
-            return
-          }
 
-          if (this.activeElement === null) {
-            detail = { address: input.value }
-          } else {
-            // TODO - this is buggy and fails.
-            console.log('Active: ', this.activeElement, this.activeIndex)
-            detail = { id: this.activeElement.suggestionId }
-          }
+      if (activeSuggestion === null) {
+        detail = { address: input.value }
+      } else {
+        console.log('Active: ', this.activeElement, this.activeIndex)
+        detail = { id: activeSuggestion.attributes['suggestion-id'].value }
+      }
 
-          this.dispatchEvent(new CustomEvent('suggestionSelect', {
-            detail: detail
-          }))
-          input.value = ''
-          break
-        case 'Backspace':
-          if (input.value === '') {
-            const addresses = this.children
-            if (addresses.length > 1) {
-              const last = addresses[addresses.length - 2] // Very last element is the input box.
-              this.dispatchEvent(new CustomEvent('removeSelection', {
-                detail: {
-                  id: last.querySelector('a.button').attributes['phx-value-id'].value
-                }
-              }))
-            }
-          } else {
-            return
-          }
-          break
-        case 'Escape':
-          this.dispatchEvent(new CustomEvent('clearSuggestions'))
-          break
-        default:
-          return
+      dispatch('add_to', detail)
+      input.value = ''
+    },
+
+    backspace (event, dispatch) {
+      const input = this.$refs.inputElement
+      if (input.value !== '') {
+        return
+      }
+      const addresses = this.$el.children
+      if (addresses.length > 1) {
+        const last = addresses[addresses.length - 2]
+        dispatch('remove_to_address', { id: last.querySelector('a.button').attributes['phx-value-id'].value })
       }
       event.preventDefault()
-    })
+    },
 
-    this.addEventListener('suggestionMouseOver', (event) => {
-      this.activeIndex = event.originalTarget.index
-    })
+    input: {
+      '@keydown.arrow-down.prevent': 'setActive(active + 1)',
+      '@keydown.arrow-up.prevent': 'setActive(active - 1)',
+      '@keydown.tab.prevent': 'addItem($dispatch)',
+      '@keydown.enter.prevent': 'addItem($dispatch)',
+      '@keydown.backspace': 'backspace($event, $dispatch)',
+      '@keydown.escape.prevent': '$dispatch("clear_suggestions")'
+    },
 
-    this.addEventListener('suggestionAdded', (event) => {
-      if (event.originalTarget.index === this.activeIndex) {
-        event.originalTarget.classList.add('active-suggestion')
+    suggestion: (index) => {
+      return {
+        '@click': "$dispatch('add_to', {id: $event.originalTarget.attributes['suggestion-id'].value})",
+        '@mouseover': function () { this.active = index },
+        'x-bind:class': function () { return { 'active-suggestion': this.active === index } }
       }
-    })
-
-    this.querySelector('input').addEventListener('blur', event => {
-      setTimeout(() => {
-        this.dispatchEvent(new CustomEvent('clearSuggestions'))
-      }, 100)
-    })
-  }
-
-  get activeIndex () {
-    return this._activeIndex
-  }
-
-  set activeIndex (newIndex) {
-    const container = this.querySelector('.autocomplete_suggestions')
-    if (newIndex >= container.children.length) {
-      newIndex = container.children.length - 1
-    } else if (newIndex < 0) {
-      newIndex = 0
-    }
-
-    if (this._activeIndex !== newIndex) {
-      if (this.activeIndex < container.children.length) {
-        container.children[this._activeIndex].classList.remove('active-suggestion')
-      }
-      container.children[newIndex].classList.add('active-suggestion')
-
-      this._activeIndex = newIndex
-    }
-  }
-
-  get activeElement () {
-    const container = this.querySelector('.autocomplete_suggestions')
-    if (container !== null) {
-      return container.children[this.activeIndex]
-    } else {
-      return null
     }
   }
 }
-customElements.define('multi-input', MultiInput)
-
-class MultiInputSuggestion extends HTMLElement {
-  connectedCallback () {
-    this.addEventListener('mouseover', event => {
-      this.dispatchEvent(new CustomEvent('suggestionMouseOver', {
-        bubbles: true
-      }))
-    })
-
-    this.addEventListener('click', event => {
-      this.dispatchEvent(new CustomEvent('suggestionSelect', {
-        bubbles: true,
-        detail: {
-          id: this.suggestionId
-        }
-      }))
-    })
-
-    this.dispatchEvent(new CustomEvent('suggestionAdded', {
-      bubbles: true
-    }))
-  }
-
-  get index () {
-    return parseInt(this.attributes.index.value)
-  }
-
-  get suggestionId () {
-    return this.attributes['suggestion-id'].value
-  }
-}
-
-customElements.define('multi-input-suggestion', MultiInputSuggestion)
 
 const Hooks = {}
 
-Hooks.AddressInput = {
+Hooks.PushEvent = {
   mounted () {
-    this.el.addEventListener('suggestionSelect', event => {
-      this.pushEvent('add_to', event.detail)
-    })
+    const eventNames = this.el.attributes['phx-push-event'].value.split(',')
+    for (const eventName of eventNames) {
+      this.el.addEventListener(eventName, (event) => {
+        this.pushEvent(eventName, event.detail)
+      })
+    }
+  }
+}
 
-    this.el.addEventListener('clearSuggestions', event => {
-      this.pushEvent('clear_suggestions', {})
-    })
-
-    this.el.addEventListener('removeSelection', event => {
-      this.pushEvent('remove_to_address', event.detail)
-    })
+Hooks.LogHook = {
+  updated () {
+    console.log('Updated: ', this.el)
+  },
+  mounted () {
+    console.log('Mounted: ', this.el)
   }
 }
 
 const csrfToken = document.querySelector("meta[name='csrf-token']").getAttribute('content')
-const liveSocket = new LiveSocket('/live', Socket, { params: { _csrf_token: csrfToken }, hooks: Hooks })
+const liveSocket = new LiveSocket('/live', Socket, {
+  params: { _csrf_token: csrfToken },
+  hooks: Hooks,
+  dom: {
+    onBeforeElUpdated (from, to) {
+      if (from.__x) {
+        window.Alpine.clone(from.__x, to)
+      }
+    }
+  }
+})
 
 // Show progress bar on live navigation and form submits
 window.addEventListener('phx:page-loading-start', info => NProgress.start())

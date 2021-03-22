@@ -66,18 +66,34 @@ defmodule Phail.Message do
     |> Repo.update!()
   end
 
-  def add_to_address(message, to_address) do
+  def add_address(message, address_type, new_address) do
     message
     |> Changeset.change()
-    |> Changeset.put_assoc(:to_addresses, message.to_addresses ++ [to_address])
+    |> add_to_address_association(message, address_type, new_address)
     |> Repo.update!()
   end
 
-  def remove_to_address(message, to_address) do
+  defp add_to_address_association(changeset, message, :to, new_address) do
+    Changeset.put_assoc(changeset, :to_addresses, message.to_addresses ++ [new_address])
+  end
+
+  defp add_to_address_association(changeset, message, :cc, new_address) do
+    Changeset.put_assoc(changeset, :cc_addresses, message.cc_addresses ++ [new_address])
+  end
+
+  def remove_address(message, address_type, address) do
     message
     |> Changeset.change()
-    |> Changeset.put_assoc(:to_addresses, List.delete(message.to_addresses, to_address))
+    |> remove_from_address_association(message, address_type, address)
     |> Repo.update!()
+  end
+
+  defp remove_from_address_association(changeset, message, :to, address) do
+    Changeset.put_assoc(changeset, :to_addresses, List.delete(message.to_addresses, address))
+  end
+
+  defp remove_from_address_association(changeset, message, :cc, address) do
+    Changeset.put_assoc(changeset, :cc_addresses, List.delete(message.cc_addresses, address))
   end
 
   def delete(message) do

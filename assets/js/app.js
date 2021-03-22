@@ -46,7 +46,7 @@ window.multiInput = () => {
       console.log('Dispatch', eventName, data, this.$refs)
     },
 
-    addItem (dispatch) {
+    addItem (event, dispatch) {
       const input = this.$refs.inputElement
       if (input.value === '') {
         return
@@ -64,8 +64,10 @@ window.multiInput = () => {
         detail = { id: activeSuggestion.attributes['suggestion-id'].value }
       }
 
-      dispatch('add_to', detail)
+      dispatch('add_address', detail)
       input.value = ''
+
+      event.preventDefault()
     },
 
     backspace (event, dispatch) {
@@ -76,7 +78,7 @@ window.multiInput = () => {
       const addresses = this.$el.children
       if (addresses.length > 1) {
         const last = addresses[addresses.length - 2]
-        dispatch('remove_to_address', { id: last.querySelector('a.button').attributes['phx-value-id'].value })
+        dispatch('remove_address', { id: last.querySelector('a.cross-icon').attributes['phx-value-id'].value })
       }
       event.preventDefault()
     },
@@ -84,8 +86,8 @@ window.multiInput = () => {
     input: {
       '@keydown.arrow-down.prevent': 'setActive(active + 1)',
       '@keydown.arrow-up.prevent': 'setActive(active - 1)',
-      '@keydown.tab.prevent': 'addItem($dispatch)',
-      '@keydown.enter.prevent': 'addItem($dispatch)',
+      '@keydown.tab': 'addItem($event, $dispatch)',
+      '@keydown.enter.prevent': 'addItem($event, $dispatch)',
       '@keydown.backspace': 'backspace($event, $dispatch)',
       '@keydown.escape.prevent': '$dispatch("clear_suggestions")',
       '@click.away': 'showSuggestions = false',
@@ -94,7 +96,7 @@ window.multiInput = () => {
 
     suggestion: (index) => {
       return {
-        '@click': "$dispatch('add_to', {id: $event.originalTarget.attributes['suggestion-id'].value})",
+        '@click': "$dispatch('add_address', {id: $event.originalTarget.attributes['suggestion-id'].value})",
         '@mouseover': function () { this.active = index },
         'x-bind:class': function () { return { 'active-suggestion': this.active === index } }
       }
@@ -109,6 +111,7 @@ Hooks.PushEvent = {
     const eventNames = this.el.attributes['phx-push-event'].value.split(',')
     for (const eventName of eventNames) {
       this.el.addEventListener(eventName, (event) => {
+        event.detail['input_id'] = this.el.id;
         this.pushEvent(eventName, event.detail)
       })
     }

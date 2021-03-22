@@ -11,14 +11,18 @@ defmodule PhailWeb.Live.Compose do
     {:ok, socket}
   end
 
+  defmodule AddressInput do
+    defstruct suggestions: [], input_value: ""
+  end
+
   def mount(%{"message_id" => message_id}, _session, socket) do
     message = Message.get(message_id)
 
     socket
     |> assign(:message, message)
     |> assign(:conversation, Conversation.get(message.conversation.id))
-    |> assign(:add_to, "")
-    |> clear_suggestions
+    |> assign(:to_input, %AddressInput{})
+    |> assign(:cc_input, %AddressInput{})
     |> ok
   end
 
@@ -28,7 +32,6 @@ defmodule PhailWeb.Live.Compose do
     socket
     |> assign(:reply_to, reply_to)
     |> new_reply(reply_to)
-    |> clear_suggestions
     |> ok
   end
 
@@ -38,11 +41,12 @@ defmodule PhailWeb.Live.Compose do
       :subject => "",
       :body => "",
       :id => nil,
-      :to_addresses => []
+      :to_addresses => [],
+      :cc_addresses => []
     })
     |> assign(:conversation, nil)
-    |> assign(:add_to, "")
-    |> clear_suggestions
+    |> assign(:to_input, %AddressInput{})
+    |> assign(:cc_input, %AddressInput{})
     |> ok
   end
 
@@ -51,9 +55,17 @@ defmodule PhailWeb.Live.Compose do
     noreply(socket)
   end
 
-  def handle_event("change", mail_data = %{"add_to" => add_to}, socket) do
+  def handle_event("change", mail_data = %{"to" => input_value, "_target" => ["to"]}, socket) do
+    IO.inspect({:change, mail_data})
     socket
-    |> update_suggestions(add_to)
+    |> update_suggestions(:to_input, input_value)
+    |> update_message(fn message -> Message.update_draft(message, mail_data) end)
+    |> noreply
+  end
+
+  def handle_event("change", mail_data = %{"cc" => input_value, "_target" => ["cc"]}, socket) do
+    socket
+    |> update_suggestions(:cc_input, input_value)
     |> update_message(fn message -> Message.update_draft(message, mail_data) end)
     |> noreply
   end
@@ -72,23 +84,25 @@ defmodule PhailWeb.Live.Compose do
     handle_event("close", mail_data, socket)
   end
 
-  def handle_event("add_to", %{"id" => id}, socket) do
+  def handle_event("add_address", %{"input_id" => input_id, "id" => id}, socket) do
     socket
-    |> add_to_address(Address.get(id))
+    |> add_address(address_type(input_id), Address.get(id))
+    |> update_suggestions(input_id, "")
     |> noreply
   end
 
-  def handle_event("add_to", %{"address" => address}, socket) do
+  def handle_event("add_address", %{"input_id" => input_id, "address" => address}, socket) do
     socket
-    |> add_to_address(Address.get_or_create(%{address: address, name: ""}))
+    |> add_address(address_type(input_id), Address.get_or_create(%{address: address, name: ""}))
+    |> update_suggestions(input_id, "")
     |> noreply
   end
 
-  def handle_event("remove_to_address", %{"id" => id}, socket) do
-    to_address = Address.get(id)
+  def handle_event("remove_address", %{"input_id" => input_id, "id" => id}, socket) do
+    address = Address.get(id)
 
     socket
-    |> update_message(fn message -> Message.remove_to_address(message, to_address) end)
+    |> update_message(fn message -> Message.remove_address(message, address_type(input_id), address) end)
     |> noreply
   end
 
@@ -100,9 +114,9 @@ defmodule PhailWeb.Live.Compose do
     |> noreply
   end
 
-  def handle_event("clear_suggestions", %{}, socket) do
+  def handle_event("clear_suggestions", %{"input_id" => input_id}, socket) do
     socket
-    |> clear_suggestions
+    |> update_suggestions(input_id, "")
     |> noreply
   end
 
@@ -112,37 +126,30 @@ defmodule PhailWeb.Live.Compose do
     )
   end
 
-  defp update_suggestions(socket, add_to) do
-    update_suggestions(socket, add_to, socket.assigns.add_to)
+  defp update_suggestions(socket, "to_input", input_value) do
+    update_suggestions(socket, :to_input, input_value)
   end
 
-  defp update_suggestions(socket, add_to, add_to) do
+  defp update_suggestions(socket, "cc_input", input_value) do
+    update_suggestions(socket, :cc_input, input_value)
+  end
+  
+  defp update_suggestions(socket, input, input_value) do
+    update_suggestions(socket, input, input_value, socket.assigns[input].input_value)
+  end
+
+  defp update_suggestions(socket, _input, input_value, last_input_value) when input_value == last_input_value do
     socket
   end
 
-  defp update_suggestions(socket, "", _last_add_to) do
+  defp update_suggestions(socket, input, input_value, _last_input_value) do
     socket
-    |> assign(:suggestions, [])
-    |> assign(:add_to, "")
+    |> assign(input, %AddressInput{suggestions: Address.prefix_search(input_value), input_value: input_value})
   end
 
-  defp update_suggestions(socket, add_to, _last_add_to) do
+  defp add_address(socket, address_type, to_address) do
     socket
-    |> assign(:suggestions, Address.prefix_search(add_to))
-    |> assign(:add_to, add_to)
-  end
-
-  defp clear_suggestions(socket) do
-    socket
-    |> assign(:suggestions, [])
-  end
-
-  defp add_to_address(socket, to_address) do
-    socket
-    |> update_message(fn message -> Message.add_to_address(message, to_address) end)
-    |> assign(:add_to, "")
-    |> update_suggestions("")
-    |> clear_suggestions
+    |> update_message(fn message -> Message.add_address(message, address_type, to_address) end)
   end
 
   defp ensure_message(socket) do
@@ -175,4 +182,7 @@ defmodule PhailWeb.Live.Compose do
   def handle_info(_, socket) do
     noreply(socket)
   end
+
+  defp address_type("to_input"), do: :to
+  defp address_type("cc_input"), do: :cc
 end

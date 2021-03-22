@@ -339,3 +339,39 @@ span.conversation-label {
   float: left;
   padding: 0 1em;
 }
+
+.cross-icon {
+   width: 1.2em;
+   height: 1.2em;
+   position: relative;
+   transform:  rotate(45deg);
+   background: var(--main-color);
+   display: inline-block;
+   border-radius: 50%;
+   vertical-align: middle;
+   cursor: pointer;
+}
+
+.cross-icon:before, .cross-icon:after {
+  content: "";
+  position: absolute;
+  z-index: -1;
+  border-radius: 5px; 
+  background: #fff;
+}
+
+.cross-icon:before {
+  left: 50%;
+  width: 20%;
+  margin-left: -10%;
+  margin-top: 10%;
+  height: 80%;
+}
+
+.cross-icon:after {
+  top: 50%;
+  height: 20%;
+  margin-top: -10%;
+  margin-left: 10%;
+  width: 80%;
+}

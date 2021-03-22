@@ -1,30 +1,11 @@
 <form phx-submit="submit" phx-change="change">
 <ul class=form-items>
-  <li><label for="to">To</label>
-    <div id="to-input-div" class="address-input input" x-data="multiInput()" x-init="console.log('initted div')" phx-hook="PushEvent" phx-push-event="add_to,remove_to_address,clear_suggestions">
-    <%= for to <- @message.to_addresses do %>
-      <div id="to-address-<%= to.id %>" class="message-recipient" title="<%= PhailView.format_address to %>"><%= PhailView.address_name to %><a class="button" phx-click="remove_to_address" phx-value-id="<%= to.id %>">X</a></div>
-    <% end %>
-      <div class="autocomplete">
-        <input
-          name="add_to"
-          id="to"
-          type=text
-          autocomplete="off"
-          value=""
-          x-spread="input"
-          x-ref="inputElement"
-          >
-        <%= if @suggestions != [] do %>
-          <ul x-ref="suggestions" x-show.transition="showSuggestions" class="autocomplete_suggestions">
-          <%= for {suggestion, idx} <- Enum.with_index(@suggestions) do %>
-            <li id="suggestion-<%= suggestion.id %>" x-spread="suggestion( <%= idx %> )" suggestion-id="<%= suggestion.id %>">
-              <%= PhailView.format_address suggestion %>
-            </li>
-          <% end %>
-          </ul>
-        <% end %>
-      </div>
+  <li><label for="to_input">To</label>
+    <%= PhailView.address_input("to", @message.to_addresses, @to_input.suggestions) %>
+    </div>
+  </li>
+  <li><label for="cc_input">Cc</label>
+    <%= PhailView.address_input("cc", @message.cc_addresses, @cc_input.suggestions) %>
     </div>
   </li>
   <li>

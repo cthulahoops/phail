@@ -46,28 +46,28 @@ window.multiInput = () => {
       console.log('Dispatch', eventName, data, this.$refs)
     },
 
-    addItem (event, dispatch) {
+    addActiveItem (event, dispatch) {
       const input = this.$refs.inputElement
       if (input.value === '') {
         return
       }
 
       const activeSuggestion = this.activeSuggestion()
-      console.log('Active suggestion: ', this.activeSuggestion())
+      this.addItem(dispatch, this.activeSuggestion())
+      event.preventDefault()
+    },
 
+    addItem(dispatch, item) {
       let detail
 
-      if (activeSuggestion === null) {
-        detail = { address: input.value }
+      if (item === null) {
+        detail = { address: this.$refs.inputElement.value, name: ""  }
       } else {
-        console.log('Active: ', this.activeElement, this.activeIndex)
-        detail = { id: activeSuggestion.attributes['suggestion-id'].value }
+        detail = { id: item.attributes['suggestion-id'].value }
       }
 
       dispatch('add_address', detail)
-      input.value = ''
-
-      event.preventDefault()
+      this.$refs.inputElement.value = ''
     },
 
     backspace (event, dispatch) {
@@ -86,8 +86,8 @@ window.multiInput = () => {
     input: {
       '@keydown.arrow-down.prevent': 'setActive(active + 1)',
       '@keydown.arrow-up.prevent': 'setActive(active - 1)',
-      '@keydown.tab': 'addItem($event, $dispatch)',
-      '@keydown.enter.prevent': 'addItem($event, $dispatch)',
+      '@keydown.tab': 'addActiveItem($event, $dispatch)',
+      '@keydown.enter.prevent': 'addActiveItem($event, $dispatch)',
       '@keydown.backspace': 'backspace($event, $dispatch)',
       '@keydown.escape.prevent': '$dispatch("clear_suggestions")',
       '@click.away': 'showSuggestions = false',
@@ -96,8 +96,8 @@ window.multiInput = () => {
 
     suggestion: (index) => {
       return {
-        '@click': "$dispatch('add_address', {id: $event.originalTarget.attributes['suggestion-id'].value})",
-        '@mouseover': function () { this.active = index },
+        '@click': "addItem($dispatch, $event.originalTarget)",
+        '@mouseover': function () { console.log("Mouse over: ", index); this.active = index },
         'x-bind:class': function () { return { 'active-suggestion': this.active === index } }
       }
     }

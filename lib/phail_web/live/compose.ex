@@ -83,6 +83,13 @@ defmodule PhailWeb.Live.Compose do
     handle_event("close", mail_data, socket)
   end
 
+  def handle_event("add_address", %{"input_id" => input_id, "id" => id}, socket) do
+    socket
+    |> add_address(address_type(input_id), MessageAddress.get(id))
+    |> update_suggestions(input_id, "")
+    |> noreply
+  end
+
   def handle_event("add_address", %{"input_id" => input_id, "address" => address, "name" => name}, socket) do
     socket
     |> add_address(address_type(input_id), %{address: address, name: name})

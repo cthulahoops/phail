@@ -52,7 +52,7 @@ defmodule PhailWeb.PhailView do
       <%= if @suggestions != [] do %>
         <ul x-ref="suggestions" x-show.transition="showSuggestions" class="autocomplete_suggestions">
         <%= for {suggestion, idx} <- Enum.with_index(@suggestions) do %>
-          <li x-spread="suggestion( <%= idx %> )" suggestion-name="<%= suggestion.name %>" suggestion-address="<%= suggestion.address %>">
+          <li x-spread="suggestion( <%= idx %> )" suggestion-id="<%= suggestion.id %>">
             <%= format_address suggestion %>
           </li>
         <% end %>

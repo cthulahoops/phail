@@ -4,7 +4,7 @@ defmodule Phail.Reply do
   def create(original_message = %Message{}) do
     Message.create(
       original_message.conversation,
-      to: original_message.from_addresses,
+      to: Message.from_addresses(original_message),
       subject: subject_with_re_prefix(original_message.subject),
       status: "draft"
     )

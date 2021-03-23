@@ -6,10 +6,11 @@ defmodule Phail.Message do
   use Ecto.Schema
   alias Phail.Message
   alias Phail.Repo
-  alias Phail.Address
   alias Phail.Conversation
+  alias Phail.MessageAddress
 
   defenum(MessageStatus, :message_status, [:draft, :outbox, :sent])
+
 
   schema "messages" do
     field(:subject, :string)
@@ -19,25 +20,7 @@ defmodule Phail.Message do
     field(:message_id, :string)
     belongs_to(:conversation, Conversation)
 
-    many_to_many(
-      :from_addresses,
-      Address,
-      join_through: "message_from_address"
-    )
-
-    many_to_many(
-      :to_addresses,
-      Address,
-      join_through: "message_to_address",
-      on_replace: :delete
-    )
-
-    many_to_many(
-      :cc_addresses,
-      Address,
-      join_through: "message_cc_address",
-      on_replace: :delete
-    )
+    has_many(:message_addresses, MessageAddress)
   end
 
   def create(conversation, options \\ []) do
@@ -48,52 +31,45 @@ defmodule Phail.Message do
     cc = Keyword.get(options, :cc, [])
     status = Keyword.get(options, :status)
 
-    %Message{
+    message = %Message{
       subject: subject,
       body: body,
       status: status,
-      to_addresses: [],
-      from_addresses: [],
-      cc_addresses: [],
+      message_addresses: [],
       conversation: conversation,
       message_id: new_message_id()
     }
     |> Repo.insert!()
-    |> Changeset.change()
-    |> Changeset.put_assoc(:from_addresses, from)
-    |> Changeset.put_assoc(:to_addresses, to)
-    |> Changeset.put_assoc(:cc_addresses, cc)
-    |> Repo.update!()
-  end
 
-  def add_address(message, address_type, new_address) do
+    for address <- from do
+      add_address(message, :from, address)
+    end
+
+    for address <- to do
+      add_address(message, :to, address)
+    end
+
+    for address <- cc do
+      add_address(message, :cc, address)
+    end
+
     message
-    |> Changeset.change()
-    |> add_to_address_association(message, address_type, new_address)
-    |> Repo.update!()
   end
 
-  defp add_to_address_association(changeset, message, :to, new_address) do
-    Changeset.put_assoc(changeset, :to_addresses, message.to_addresses ++ [new_address])
+  def add_address(message, address_type, %{address: address, name: name}) do
+    add_address(message, address_type, address, name)
   end
 
-  defp add_to_address_association(changeset, message, :cc, new_address) do
-    Changeset.put_assoc(changeset, :cc_addresses, message.cc_addresses ++ [new_address])
-  end
-
-  def remove_address(message, address_type, address) do
+  def add_address(message, address_type, address, name) do
     message
-    |> Changeset.change()
-    |> remove_from_address_association(message, address_type, address)
-    |> Repo.update!()
+    |> Ecto.build_assoc(:message_addresses, %{name: name, address: address, type: Atom.to_string(address_type)})
+    |> Repo.insert!()
+    get(message.id)
   end
 
-  defp remove_from_address_association(changeset, message, :to, address) do
-    Changeset.put_assoc(changeset, :to_addresses, List.delete(message.to_addresses, address))
-  end
-
-  defp remove_from_address_association(changeset, message, :cc, address) do
-    Changeset.put_assoc(changeset, :cc_addresses, List.delete(message.cc_addresses, address))
+  def remove_address(message, address_id) do
+    Phail.MessageAddress.get(address_id) |> Repo.delete!()
+    get(message.id)
   end
 
   def delete(message) do
@@ -130,9 +106,7 @@ defmodule Phail.Message do
     text_search(search_term)
     |> Repo.all()
     |> Repo.preload([
-      :from_addresses,
-      :to_addresses,
-      :cc_addresses
+      :message_addresses
     ])
   end
 
@@ -140,15 +114,13 @@ defmodule Phail.Message do
     Message
     |> Repo.get(id)
     |> Repo.preload([
-      :from_addresses,
-      :to_addresses,
-      :cc_addresses,
+      :message_addresses,
       :conversation
     ])
   end
 
   def all() do
-    Message |> Repo.all() |> Repo.preload([:from_addresses, :to_addresses, :cc_addresses])
+    Message |> Repo.all() |> Repo.preload([:message_addresses])
   end
 
   def set_status(message, status) do
@@ -169,7 +141,8 @@ defmodule Phail.Message do
     email =
       Email.new_email(
         from: Application.fetch_env!(:phail, :email_sender),
-        to: message.to_addresses,
+        to: Message.to_addresses(message),
+        cc: Message.cc_addresses(message),
         subject: message.subject,
         html_body: message.body,
         headers: [
@@ -190,5 +163,17 @@ defmodule Phail.Message do
 
   defp new_message_id do
     "<" <> UUID.uuid4() <> "@" <> Application.fetch_env!(:phail, :domain) <> ">"
+  end
+
+  def from_addresses(message) do
+    for m=%MessageAddress{type: "from"} <- message.message_addresses, do: m
+  end
+
+  def to_addresses(message) do
+    for m=%MessageAddress{type: "to"} <- message.message_addresses, do: m
+  end
+
+  def cc_addresses(message) do
+    for m=%MessageAddress{type: "cc"} <- message.message_addresses, do: m
   end
 end

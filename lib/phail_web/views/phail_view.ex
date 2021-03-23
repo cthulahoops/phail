@@ -1,6 +1,5 @@
 defmodule PhailWeb.PhailView do
   use PhailWeb, :view
-  alias Phail.Address
 
   def name_list(addresses) do
     assigns = %{addresses: addresses}
@@ -53,7 +52,7 @@ defmodule PhailWeb.PhailView do
       <%= if @suggestions != [] do %>
         <ul x-ref="suggestions" x-show.transition="showSuggestions" class="autocomplete_suggestions">
         <%= for {suggestion, idx} <- Enum.with_index(@suggestions) do %>
-          <li id="suggestion-<%= id %>-<%= suggestion.id %>" x-spread="suggestion( <%= idx %> )" suggestion-id="<%= suggestion.id %>">
+          <li x-spread="suggestion( <%= idx %> )" suggestion-name="<%= suggestion.name %>" suggestion-address="<%= suggestion.address %>">
             <%= format_address suggestion %>
           </li>
         <% end %>
@@ -63,12 +62,12 @@ defmodule PhailWeb.PhailView do
     """
   end
 
-  def format_address(%Address{address: address, name: ""}), do: address
-  def format_address(%Address{address: address, name: name}), do: name <> " <" <> address <> ">"
+  def format_address(%{address: address, name: ""}), do: address
+  def format_address(%{address: address, name: name}), do: name <> " <" <> address <> ">"
 
-  def address_name(%Address{address: address, name: ""}), do: address
-  def address_name(%Address{name: name}), do: name
+  def address_name(%{address: address, name: ""}), do: address
+  def address_name(%{name: name}), do: name
 
-  def address_short(%Address{address: address, name: ""}), do: address
-  def address_short(%Address{name: name}), do: hd(String.split(name, " "))
+  def address_short(%{address: address, name: ""}), do: address
+  def address_short(%{name: name}), do: hd(String.split(name, " "))
 end

@@ -1,11 +1,11 @@
 <form phx-submit="submit" phx-change="change">
 <ul class=form-items>
   <li><label for="to_input">To</label>
-    <%= PhailView.address_input("to", @message.to_addresses, @to_input.suggestions) %>
+    <%= PhailView.address_input("to", Phail.Message.to_addresses(@message), @to_input.suggestions) %>
     </div>
   </li>
   <li><label for="cc_input">Cc</label>
-    <%= PhailView.address_input("cc", @message.cc_addresses, @cc_input.suggestions) %>
+    <%= PhailView.address_input("cc", Phail.Message.cc_addresses(@message), @cc_input.suggestions) %>
     </div>
   </li>
   <li>

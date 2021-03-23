@@ -1,7 +1,7 @@
 defmodule PhailWeb.Live.Compose do
   use PhailWeb, :live_view
   alias PhailWeb.PhailView
-  alias Phail.{Address, Conversation, Message}
+  alias Phail.{Conversation, Message, MessageAddress}
 
   defp noreply(socket) do
     {:noreply, socket}
@@ -41,8 +41,7 @@ defmodule PhailWeb.Live.Compose do
       :subject => "",
       :body => "",
       :id => nil,
-      :to_addresses => [],
-      :cc_addresses => []
+      :message_addresses => [],
     })
     |> assign(:conversation, nil)
     |> assign(:to_input, %AddressInput{})
@@ -84,25 +83,16 @@ defmodule PhailWeb.Live.Compose do
     handle_event("close", mail_data, socket)
   end
 
-  def handle_event("add_address", %{"input_id" => input_id, "id" => id}, socket) do
+  def handle_event("add_address", %{"input_id" => input_id, "address" => address, "name" => name}, socket) do
     socket
-    |> add_address(address_type(input_id), Address.get(id))
+    |> add_address(address_type(input_id), %{address: address, name: name})
     |> update_suggestions(input_id, "")
     |> noreply
   end
 
-  def handle_event("add_address", %{"input_id" => input_id, "address" => address}, socket) do
+  def handle_event("remove_address", %{"input_id" => _input_id, "id" => id}, socket) do
     socket
-    |> add_address(address_type(input_id), Address.get_or_create(%{address: address, name: ""}))
-    |> update_suggestions(input_id, "")
-    |> noreply
-  end
-
-  def handle_event("remove_address", %{"input_id" => input_id, "id" => id}, socket) do
-    address = Address.get(id)
-
-    socket
-    |> update_message(fn message -> Message.remove_address(message, address_type(input_id), address) end)
+    |> update_message(fn message -> Message.remove_address(message, id) end)
     |> noreply
   end
 
@@ -144,7 +134,7 @@ defmodule PhailWeb.Live.Compose do
 
   defp update_suggestions(socket, input, input_value, _last_input_value) do
     socket
-    |> assign(input, %AddressInput{suggestions: Address.prefix_search(input_value), input_value: input_value})
+    |> assign(input, %AddressInput{suggestions: MessageAddress.prefix_search(input_value), input_value: input_value})
   end
 
   defp add_address(socket, address_type, to_address) do

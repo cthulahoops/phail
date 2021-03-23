@@ -34,11 +34,10 @@ def insert_conversation_from(conversation_id, address_id):
     cursor = dbh.cursor()
     cursor.execute(sql, (conversation_id, address_id))
 
-def insert_assoc(assoc_type, message_id, address_id):
-    table_name = f"message_{assoc_type}_address"
-    sql = f"insert into {table_name} (message_id, address_id) values (%s, %s) on conflict do nothing"
+def insert_message_address(address_type, message_id, address):
+    sql = "insert into message_addresses (message_id, type, address, name) values (%s, %s, %s, %s) on conflict do nothing"
     cursor = dbh.cursor()
-    cursor.execute(sql, (message_id, address_id))
+    cursor.execute(sql, (message_id, address_type, address['email'], address['name']))
 
 def create_label(name):
     cursor = dbh.cursor()
@@ -106,8 +105,6 @@ def insert_message(message, extra_labels=[]):
         return # Skip chats for now!
 
     from_addresses = list(map(get_address, message.addresses('from')))
-    to_addresses = list(map(get_address, message.addresses('to')))
-    cc_addresses = list(map(get_address, message.addresses('cc')))
 
     cursor = dbh.cursor()
     cursor.execute(
@@ -119,14 +116,9 @@ def insert_message(message, extra_labels=[]):
         ))
     message_id = cursor.fetchone()[0]
 
-    for address_id in from_addresses:
-        insert_assoc("from", message_id, address_id)
-
-    for address_id in to_addresses:
-        insert_assoc("to", message_id, address_id)
-
-    for address_id in cc_addresses:
-        insert_assoc("cc", message_id, address_id)
+    for address_type in ['from', 'to', 'cc']:
+        for address in message.addresses(address_type):
+            insert_message_address(address_type, message_id, address)
 
     for reference in message.references:
         insert_reference(message_id, reference)

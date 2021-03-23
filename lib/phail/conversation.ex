@@ -129,9 +129,7 @@ defmodule Phail.Conversation do
         from(m in Message,
           order_by: m.date,
           preload: [
-            :from_addresses,
-            :to_addresses,
-            :cc_addresses
+            :message_addresses
           ]
         )
     )

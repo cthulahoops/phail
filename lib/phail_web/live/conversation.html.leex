@@ -8,19 +8,19 @@
       class="message-header">
     <li>
       <span class="message-header-key">From</span>
-      <span class="message-header-value"><%= PhailView.address_list message.from_addresses %></span>
+      <span class="message-header-value"><%= PhailView.address_list Phail.Message.from_addresses(message) %></span>
     </li>
     <%= if hidden?(@hidden, message.id) do %>
       </ul>
     <% else %>
       <li>
         <span class="message-header-key">To</span>
-        <span class="message-header-value"><%= PhailView.address_list message.to_addresses %></span>
+        <span class="message-header-value"><%= PhailView.address_list Phail.Message.to_addresses(message) %></span>
       </li>
-      <%= if message.cc_addresses != [] do %>
+      <%= if Phail.Message.cc_addresses(message) != [] do %>
       <li>
         <span class="message-header-key">Cc</span>
-        <span class="message-header-value"><%= PhailView.address_list message.cc_addresses %></span>
+        <span class="message-header-value"><%= PhailView.address_list Phail.Message.cc_addresses(message) %></span>
       </li>
       <% end %>
       <li>

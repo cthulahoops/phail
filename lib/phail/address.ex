@@ -44,6 +44,7 @@ defmodule Phail.Address do
   def prefix_search("") do
     []
   end
+
   def prefix_search(prefix_string) do
     search_pattern = "#{prefix_string}%"
 

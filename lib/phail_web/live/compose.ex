@@ -41,7 +41,7 @@ defmodule PhailWeb.Live.Compose do
       :subject => "",
       :body => "",
       :id => nil,
-      :message_addresses => [],
+      :message_addresses => []
     })
     |> assign(:conversation, nil)
     |> assign(:to_input, %AddressInput{})
@@ -56,6 +56,7 @@ defmodule PhailWeb.Live.Compose do
 
   def handle_event("change", mail_data = %{"to" => input_value, "_target" => ["to"]}, socket) do
     IO.inspect({:change, mail_data})
+
     socket
     |> update_suggestions(:to_input, input_value)
     |> update_message(fn message -> Message.update_draft(message, mail_data) end)
@@ -90,7 +91,11 @@ defmodule PhailWeb.Live.Compose do
     |> noreply
   end
 
-  def handle_event("add_address", %{"input_id" => input_id, "address" => address, "name" => name}, socket) do
+  def handle_event(
+        "add_address",
+        %{"input_id" => input_id, "address" => address, "name" => name},
+        socket
+      ) do
     socket
     |> add_address(address_type(input_id), %{address: address, name: name})
     |> update_suggestions(input_id, "")
@@ -130,18 +135,22 @@ defmodule PhailWeb.Live.Compose do
   defp update_suggestions(socket, "cc_input", input_value) do
     update_suggestions(socket, :cc_input, input_value)
   end
-  
+
   defp update_suggestions(socket, input, input_value) do
     update_suggestions(socket, input, input_value, socket.assigns[input].input_value)
   end
 
-  defp update_suggestions(socket, _input, input_value, last_input_value) when input_value == last_input_value do
+  defp update_suggestions(socket, _input, input_value, last_input_value)
+       when input_value == last_input_value do
     socket
   end
 
   defp update_suggestions(socket, input, input_value, _last_input_value) do
     socket
-    |> assign(input, %AddressInput{suggestions: MessageAddress.prefix_search(input_value), input_value: input_value})
+    |> assign(input, %AddressInput{
+      suggestions: MessageAddress.prefix_search(input_value),
+      input_value: input_value
+    })
   end
 
   defp add_address(socket, address_type, to_address) do

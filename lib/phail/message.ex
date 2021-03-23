@@ -11,7 +11,6 @@ defmodule Phail.Message do
 
   defenum(MessageStatus, :message_status, [:draft, :outbox, :sent])
 
-
   schema "messages" do
     field(:subject, :string)
     field(:body, :string)
@@ -31,15 +30,16 @@ defmodule Phail.Message do
     cc = Keyword.get(options, :cc, [])
     status = Keyword.get(options, :status)
 
-    message = %Message{
-      subject: subject,
-      body: body,
-      status: status,
-      message_addresses: [],
-      conversation: conversation,
-      message_id: new_message_id()
-    }
-    |> Repo.insert!()
+    message =
+      %Message{
+        subject: subject,
+        body: body,
+        status: status,
+        message_addresses: [],
+        conversation: conversation,
+        message_id: new_message_id()
+      }
+      |> Repo.insert!()
 
     for address <- from do
       add_address(message, :from, address)
@@ -62,8 +62,13 @@ defmodule Phail.Message do
 
   def add_address(message, address_type, address, name) do
     message
-    |> Ecto.build_assoc(:message_addresses, %{name: name, address: address, type: Atom.to_string(address_type)})
+    |> Ecto.build_assoc(:message_addresses, %{
+      name: name,
+      address: address,
+      type: Atom.to_string(address_type)
+    })
     |> Repo.insert!()
+
     get(message.id)
   end
 
@@ -78,10 +83,11 @@ defmodule Phail.Message do
   end
 
   def update_draft(message, mail_data \\ %{}) do
-    message = message
-    |> Changeset.change()
-    |> Changeset.cast(mail_data, [:subject, :body])
-    |> Repo.update!()
+    message =
+      message
+      |> Changeset.change()
+      |> Changeset.cast(mail_data, [:subject, :body])
+      |> Repo.update!()
 
     if message.conversation.is_draft do
       message.conversation
@@ -166,14 +172,14 @@ defmodule Phail.Message do
   end
 
   def from_addresses(message) do
-    for m=%MessageAddress{type: "from"} <- message.message_addresses, do: m
+    for m = %MessageAddress{type: "from"} <- message.message_addresses, do: m
   end
 
   def to_addresses(message) do
-    for m=%MessageAddress{type: "to"} <- message.message_addresses, do: m
+    for m = %MessageAddress{type: "to"} <- message.message_addresses, do: m
   end
 
   def cc_addresses(message) do
-    for m=%MessageAddress{type: "cc"} <- message.message_addresses, do: m
+    for m = %MessageAddress{type: "cc"} <- message.message_addresses, do: m
   end
 end

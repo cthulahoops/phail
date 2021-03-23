@@ -33,20 +33,23 @@ defmodule MessageTest do
   describe "Message sending" do
     setup do
       conversation = Conversation.create("Test Message")
-      message = Message.create(
-            conversation,
-            subject: "Test Message",
-            body: "Some body text for the message"
-          )
+
+      message =
+        Message.create(
+          conversation,
+          subject: "Test Message",
+          body: "Some body text for the message"
+        )
+
       %{message: message}
     end
 
     test "Sending sets message date.", %{message: message} do
-      assert message.date == :nil
+      assert message.date == nil
       Message.send(message)
 
       message = Message.get(message.id)
-      assert message.date != :nil
+      assert message.date != nil
     end
   end
 end

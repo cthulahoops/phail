@@ -30,7 +30,8 @@ defmodule PhailWeb.PhailView do
   end
 
   def address_input(id, addresses, suggestions) do
-    assigns = %{ id: id, addresses: addresses, suggestions: suggestions }
+    assigns = %{id: id, addresses: addresses, suggestions: suggestions}
+
     ~L"""
     <div id="<%= id %>_input" x-on:click="$refs.inputElement.focus()"class="address-input input" x-data="multiInput()" phx-hook="PushEvent" phx-push-event="add_address,remove_address,clear_suggestions">
     <%= for address <- @addresses do %>

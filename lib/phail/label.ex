@@ -16,7 +16,8 @@ defmodule Phail.Label do
 
   def all() do
     from(l in Label,
-      order_by: l.name)
+      order_by: l.name
+    )
     |> Repo.all()
   end
 

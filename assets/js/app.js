@@ -52,16 +52,15 @@ window.multiInput = () => {
         return
       }
 
-      const activeSuggestion = this.activeSuggestion()
       this.addItem(dispatch, this.activeSuggestion())
       event.preventDefault()
     },
 
-    addItem(dispatch, item) {
+    addItem (dispatch, item) {
       let detail
 
       if (item === null) {
-        detail = { address: this.$refs.inputElement.value, name: ""  }
+        detail = { address: this.$refs.inputElement.value, name: '' }
       } else {
         detail = { id: item.attributes['suggestion-id'].value }
       }
@@ -96,8 +95,8 @@ window.multiInput = () => {
 
     suggestion: (index) => {
       return {
-        '@click': "addItem($dispatch, $event.originalTarget)",
-        '@mouseover': function () { console.log("Mouse over: ", index); this.active = index },
+        '@click': 'addItem($dispatch, $event.originalTarget)',
+        '@mouseover': function () { console.log('Mouse over: ', index); this.active = index },
         'x-bind:class': function () { return { 'active-suggestion': this.active === index } }
       }
     }
@@ -111,7 +110,7 @@ Hooks.PushEvent = {
     const eventNames = this.el.attributes['phx-push-event'].value.split(',')
     for (const eventName of eventNames) {
       this.el.addEventListener(eventName, (event) => {
-        event.detail['input_id'] = this.el.id;
+        event.detail.input_id = this.el.id
         this.pushEvent(eventName, event.detail)
       })
     }

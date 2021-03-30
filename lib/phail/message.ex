@@ -172,14 +172,14 @@ defmodule Phail.Message do
   end
 
   def from_addresses(message) do
-    for m = %MessageAddress{type: "from"} <- message.message_addresses, do: m
+    for m = %MessageAddress{type: :from} <- message.message_addresses, do: m
   end
 
   def to_addresses(message) do
-    for m = %MessageAddress{type: "to"} <- message.message_addresses, do: m
+    for m = %MessageAddress{type: :to} <- message.message_addresses, do: m
   end
 
   def cc_addresses(message) do
-    for m = %MessageAddress{type: "cc"} <- message.message_addresses, do: m
+    for m = %MessageAddress{type: :cc} <- message.message_addresses, do: m
   end
 end

@@ -1,14 +1,17 @@
 defmodule Phail.MessageAddress do
   use Ecto.Schema
   import Ecto.Query
+  import EctoEnum
   alias Phail.Repo
   alias Phail.MessageAddress
+
+  defenum(AddressType, :address_type, [:to, :from, :cc, :bcc])
 
   schema "message_addresses" do
     field :address, :string
     field :name, :string
     field :order, :integer
-    field :type, :string
+    field :type, AddressType
 
     belongs_to :message, Phail.Message
   end

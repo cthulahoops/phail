@@ -3,7 +3,7 @@ defmodule Phail.Conversation do
   import Phail.TextSearch
   use Ecto.Schema
   alias Ecto.Changeset
-  alias Phail.{Conversation, Message, Label, Address}
+  alias Phail.{Conversation, Message, Label, MessageAddress}
   alias Phail.Repo
   alias Phail.Query
 
@@ -13,7 +13,7 @@ defmodule Phail.Conversation do
     field :is_draft, :boolean
 
     has_many(:messages, Message)
-    many_to_many(:from_addresses, Address, join_through: "conversation_from_address")
+    has_many(:from_addresses, through: [:messages, :message_addresses])
 
     many_to_many(
       :labels,
@@ -53,9 +53,17 @@ defmodule Phail.Conversation do
   end
 
   defp select_conversations() do
+    address_query = from ma in MessageAddress,
+      join: m in assoc(ma, :message),
+      where: ma.type == "from",
+      distinct: [m.conversation_id, ma.name, ma.address],
+      order_by: m.date
+
+    message_query = from m in Message,
+      select: %Message{id: m.id}
+
     from c in Conversation,
-      join: m in Message,
-      on: c.id == m.conversation_id,
+      join: m in assoc(c, :messages),
       select: %{
         c
         | date: max(m.date)
@@ -63,7 +71,11 @@ defmodule Phail.Conversation do
       group_by: c.id,
       order_by: [desc: max(m.date)],
       limit: 20,
-      preload: [:from_addresses, :labels]
+      preload: [
+        {:from_addresses, ^address_query},
+        {:messages, ^message_query},
+        :labels
+      ]
   end
 
   defp text_search(conversations, "") do

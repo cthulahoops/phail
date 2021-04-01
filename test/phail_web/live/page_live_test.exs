@@ -5,7 +5,7 @@ defmodule PhailWeb.PageLiveTest do
 
   test "disconnected and connected render", %{conn: conn} do
     {:ok, page_live, disconnected_html} = live(conn, "/")
-    assert disconnected_html =~ "Phail Mail"
+    assert disconnected_html =~ "Compose"
     assert render(page_live) =~ "Compose"
   end
 end

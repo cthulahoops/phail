@@ -53,21 +53,18 @@ defmodule Phail.Conversation do
   end
 
   defp select_conversations() do
-    address_query = from ma in MessageAddress,
-      join: m in assoc(ma, :message),
-      where: ma.type == "from",
-      distinct: [m.conversation_id, ma.name, ma.address],
-      order_by: m.date
+    address_query =
+      from ma in MessageAddress,
+        where: ma.type == "from"
 
-    message_query = from m in Message,
-      select: %Message{id: m.id}
+    message_query =
+      from m in Message,
+        select: struct(m, [:id]),
+        order_by: m.date
 
     from c in Conversation,
       join: m in assoc(c, :messages),
-      select: %{
-        c
-        | date: max(m.date)
-      },
+      select_merge: %{date: max(m.date)},
       group_by: c.id,
       order_by: [desc: max(m.date)],
       limit: 20,

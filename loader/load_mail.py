@@ -28,12 +28,6 @@ def get_address(address):
         address['email']))
     return (cursor.fetchone() or create_address(address))[0]
 
-def insert_conversation_from(conversation_id, address_id):
-    table_name = f"conversation_from_address"
-    sql = f"insert into {table_name} (conversation_id, address_id) values (%s, %s) on conflict do nothing"
-    cursor = dbh.cursor()
-    cursor.execute(sql, (conversation_id, address_id))
-
 def insert_message_address(address_type, message_id, address):
     sql = "insert into message_addresses (message_id, type, address, name) values (%s, %s, %s, %s) on conflict do nothing"
     cursor = dbh.cursor()
@@ -104,8 +98,6 @@ def insert_message(message, extra_labels=[]):
     if 'Chat' in message.labels:
         return # Skip chats for now!
 
-    from_addresses = list(map(get_address, message.addresses('from')))
-
     cursor = dbh.cursor()
     cursor.execute(
         "insert into messages (subject, body, message_id, date) values (%s, %s, %s, %s) returning (id)", (
@@ -132,9 +124,6 @@ def insert_message(message, extra_labels=[]):
         if label.lower() in ignore_labels:
             continue
         insert_label_assoc(conversation_id, label)
-
-    for address_id in from_addresses:
-        insert_conversation_from(conversation_id, address_id)
 
     dbh.commit()
 

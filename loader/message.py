@@ -48,7 +48,7 @@ class Message:
 
     @property
     def message_id(self):
-        return self.mail.get("message-id")
+        return self.mail.get("message-id").strip()
 
     @property
     def subject(self):
@@ -88,7 +88,7 @@ class Message:
     def references(self):
         references = self.mail.get("references")
         if references:
-            return references.split()
+            return [x.strip() for x in references.split()]
         return []
 
     @property

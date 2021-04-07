@@ -104,13 +104,30 @@ def get_new_conversation(message):
         return cursor.fetchone()[0]
 
 
+def get_mutual_references(message):
+    references = tuple(message.references)
+    if not references:
+        return []
+
+    with dbh.cursor() as cursor:
+        print("References: ", references)
+        cursor.execute(
+            """select distinct conversation_id from messages
+                join message_references on messages.id = message_references.message_id
+                where reference in %s""",
+            (references,),
+        )
+        return list(cursor.fetchall())
+
+
 def merge_conversations(conversation_ids):
+    conversation_ids = tuple(set(id for (id,) in conversation_ids))
+    print("Merging: ", conversation_ids)
     if not conversation_ids:
         return None
     if len(conversation_ids) == 1:
-        return conversation_ids[0][0]
+        return conversation_ids[0]
 
-    conversation_ids = tuple([id for (id,) in conversation_ids])
     with dbh.cursor() as cursor:
         cursor.execute(
             """select conversations.id from conversations
@@ -143,7 +160,9 @@ def merge_conversations(conversation_ids):
 
 def get_conversation(message):
     return merge_conversations(
-        get_referenced_conversations(message) + get_referencing_conversations(message)
+        get_referenced_conversations(message)
+        + get_referencing_conversations(message)
+        + get_mutual_references(message)
     ) or get_new_conversation(message)
 
 
@@ -151,10 +170,20 @@ def insert_message(message, extra_labels=()):
     if "Chat" in message.labels:
         return  # Skip chats for now!
 
+    conversation_id = get_conversation(message)
+
     cursor = dbh.cursor()
     cursor.execute(
-        "insert into messages (subject, body, message_id, date) values (%s, %s, %s, %s) returning (id)",
-        (message.subject, message.body, message.message_id, message.date,),
+        """insert into messages (conversation_id, subject, body, message_id, date)
+            values (%s, %s, %s, %s, %s)
+            returning (id)""",
+        (
+            conversation_id,
+            message.subject,
+            message.body,
+            message.message_id,
+            message.date,
+        ),
     )
     message_id = cursor.fetchone()[0]
 
@@ -164,13 +193,6 @@ def insert_message(message, extra_labels=()):
 
     for reference in message.references:
         insert_reference(message_id, reference)
-
-    conversation_id = get_conversation(message)
-    with dbh.cursor() as cursor:
-        cursor.execute(
-            "update messages set conversation_id = %s where id = %s",
-            (conversation_id, message_id),
-        )
 
     for label in message.labels + list(extra_labels):
         if label.lower() in ignore_labels:

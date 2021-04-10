@@ -19,10 +19,11 @@ defmodule Phail.Message do
     field(:message_id, :string)
     belongs_to(:conversation, Conversation)
 
+    belongs_to(:user, Phail.Accounts.User)
     has_many(:message_addresses, MessageAddress)
   end
 
-  def create(conversation, options \\ []) do
+  def create(user, conversation, options \\ []) do
     from = Keyword.get(options, :from, [])
     to = Keyword.get(options, :to, [])
     subject = Keyword.get(options, :subject, "")
@@ -32,6 +33,7 @@ defmodule Phail.Message do
 
     message =
       %Message{
+        user: user,
         subject: subject,
         body: body,
         status: status,
@@ -63,6 +65,7 @@ defmodule Phail.Message do
   def add_address(message, address_type, address, name) do
     message
     |> Ecto.build_assoc(:message_addresses, %{
+      user: message.user,
       name: name,
       address: address,
       type: Atom.to_string(address_type)
@@ -120,6 +123,7 @@ defmodule Phail.Message do
     Message
     |> Repo.get(id)
     |> Repo.preload([
+      :user,
       :message_addresses,
       :conversation
     ])

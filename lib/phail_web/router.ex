@@ -18,7 +18,7 @@ defmodule PhailWeb.Router do
   end
 
   scope "/", PhailWeb do
-    pipe_through :browser
+    pipe_through [:browser, :require_authenticated_user]
 
     live "/", Live.Phail
     live "/search/:search_filter/", Live.Phail, :search

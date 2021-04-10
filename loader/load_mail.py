@@ -33,12 +33,12 @@ def get_address(address):
     return (cursor.fetchone() or create_address(address))[0]
 
 
-def insert_message_address(address_type, message_id, address):
+def insert_message_address(user_id, address_type, message_id, address):
     sql = """insert into message_addresses
-        (message_id, type, address, name)
-        values (%s, %s, %s, %s) on conflict do nothing"""
+        (user_id, message_id, type, address, name)
+        values (%s, %s, %s, %s, %s) on conflict do nothing"""
     cursor = dbh.cursor()
-    cursor.execute(sql, (message_id, address_type, address["email"], address["name"]))
+    cursor.execute(sql, (user_id, message_id, address_type, address["email"], address["name"]))
 
 
 def create_label(name):
@@ -95,11 +95,11 @@ def get_referencing_conversations(message):
         return list(cursor.fetchall())
 
 
-def get_new_conversation(message):
+def get_new_conversation(user_id, message):
     with dbh.cursor() as cursor:
         cursor.execute(
-            "insert into conversations (subject) values (%s) returning (id)",
-            (message.subject,),
+            "insert into conversations (user_id, subject) values (%s, %s) returning (id)",
+            (user_id, message.subject,),
         )
         return cursor.fetchone()[0]
 
@@ -158,26 +158,27 @@ def merge_conversations(conversation_ids):
     return earliest_conversation_id
 
 
-def get_conversation(message):
+def get_conversation(user_id, message):
     return merge_conversations(
         get_referenced_conversations(message)
         + get_referencing_conversations(message)
         + get_mutual_references(message)
-    ) or get_new_conversation(message)
+    ) or get_new_conversation(user_id, message)
 
 
-def insert_message(message, extra_labels=()):
+def insert_message(user_id, message, extra_labels=()):
     if "Chat" in message.labels:
         return  # Skip chats for now!
 
-    conversation_id = get_conversation(message)
+    conversation_id = get_conversation(user_id, message)
 
     cursor = dbh.cursor()
     cursor.execute(
-        """insert into messages (conversation_id, subject, body, message_id, date)
-            values (%s, %s, %s, %s, %s)
+        """insert into messages (user_id, conversation_id, subject, body, message_id, date)
+            values (%s, %s, %s, %s, %s, %s)
             returning (id)""",
         (
+            user_id,
             conversation_id,
             message.subject,
             message.body,
@@ -189,7 +190,7 @@ def insert_message(message, extra_labels=()):
 
     for address_type in ["from", "to", "cc"]:
         for address in message.addresses(address_type):
-            insert_message_address(address_type, message_id, address)
+            insert_message_address(user_id, address_type, message_id, address)
 
     for reference in message.references:
         insert_reference(message_id, reference)
@@ -218,11 +219,11 @@ def read_message_from_stdin():
     return Message(sys.stdin.buffer.read())
 
 
-def load_messages_from_file_or_directory(input_filename):
+def load_messages_from_file_or_directory(user_id, input_filename):
     i = 0
     for message in iter_file_messages(input_filename):
         try:
-            insert_message(message)
+            insert_message(user_id, message)
         except:
             print("Failed to load: ", message)
             raise
@@ -242,12 +243,14 @@ def main():
     parser.add_argument("paths", nargs="*", help="Paths to mbox or maildir input")
     args = parser.parse_args()
 
+    user_id = 1
+
     if args.stdin:
         message = read_message_from_stdin()
-        insert_message(message, extra_labels=args.label)
+        insert_message(user_id, message, extra_labels=args.label)
 
     for path in args.paths:
-        load_messages_from_file_or_directory(path)
+        load_messages_from_file_or_directory(user_id, path)
 
 
 if __name__ == "__main__":

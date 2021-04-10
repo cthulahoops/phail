@@ -15,6 +15,8 @@ defmodule Phail.Conversation do
     has_many(:messages, Message)
     has_many(:from_addresses, through: [:messages, :message_addresses])
 
+    belongs_to(:user, Phail.Accounts.User)
+
     many_to_many(
       :labels,
       Label,
@@ -24,8 +26,9 @@ defmodule Phail.Conversation do
     )
   end
 
-  def create(subject) do
+  def create(user, subject) do
     %Conversation{
+      user: user,
       subject: subject,
       is_draft: true
     }

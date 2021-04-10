@@ -2,6 +2,7 @@ defmodule PhailWeb.Live.Compose do
   use PhailWeb, :live_view
   alias PhailWeb.PhailView
   alias Phail.{Conversation, Message, MessageAddress}
+  alias PhailWeb.LiveHelpers
 
   defp noreply(socket) do
     {:noreply, socket}
@@ -15,7 +16,11 @@ defmodule PhailWeb.Live.Compose do
     defstruct suggestions: [], input_value: ""
   end
 
-  def mount(%{"message_id" => message_id}, _session, socket) do
+  def mount(params, session, socket) do
+    mount(params, LiveHelpers.assign_defaults(socket, session))
+  end
+
+  defp mount(%{"message_id" => message_id}, socket) do
     message = Message.get(message_id)
 
     socket
@@ -26,7 +31,7 @@ defmodule PhailWeb.Live.Compose do
     |> ok
   end
 
-  def mount(%{"reply_to" => reply_to}, _session, socket) do
+  defp mount(%{"reply_to" => reply_to}, socket) do
     reply_to = Message.get(reply_to)
 
     socket
@@ -35,7 +40,7 @@ defmodule PhailWeb.Live.Compose do
     |> ok
   end
 
-  def mount(%{}, _session, socket) do
+  defp mount(%{}, socket) do
     socket
     |> assign(:message, %{
       :subject => "",
@@ -162,7 +167,8 @@ defmodule PhailWeb.Live.Compose do
     if is_nil(socket.assigns.message.id) do
       message =
         Message.create(
-          Conversation.create("Draft Message"),
+          socket.assigns.current_user,
+          Conversation.create(socket.assigns.current_user, "Draft Message"),
           status: :draft
         )
 

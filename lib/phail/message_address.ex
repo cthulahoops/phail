@@ -14,6 +14,7 @@ defmodule Phail.MessageAddress do
     field :type, AddressType
 
     belongs_to :message, Phail.Message
+    belongs_to(:user, Phail.Accounts.User)
   end
 
   def get(id) do

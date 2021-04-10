@@ -33,6 +33,7 @@ defmodule Phail.MixProject do
   # Type `mix help deps` for examples and options.
   defp deps do
     [
+      {:bcrypt_elixir, "~> 2.0"},
       {:phoenix, "~> 1.5.3"},
       {:phoenix_ecto, "~> 4.1"},
       {:ecto_sql, "~> 3.4"},
@@ -53,7 +54,8 @@ defmodule Phail.MixProject do
       {:bamboo_smtp, "~> 3.0.0"},
       {:elixir_uuid, "~> 1.2"},
       {:ecto_enum, "~> 1.4"},
-      {:calendar, "~> 1.0.0"}
+      {:calendar, "~> 1.0.0"},
+      {:phx_gen_auth, "~> 0.7", only: [:dev], runtime: false}
     ]
   end
 

@@ -1,6 +1,8 @@
 defmodule PhailWeb.Router do
   use PhailWeb, :router
 
+  import PhailWeb.UserAuth
+
   pipeline :browser do
     plug :accepts, ["html"]
     plug :fetch_session
@@ -8,6 +10,7 @@ defmodule PhailWeb.Router do
     plug :put_root_layout, {PhailWeb.LayoutView, :root}
     plug :protect_from_forgery
     plug :put_secure_browser_headers
+    plug :fetch_current_user
   end
 
   pipeline :api do
@@ -15,7 +18,7 @@ defmodule PhailWeb.Router do
   end
 
   scope "/", PhailWeb do
-    pipe_through :browser
+    pipe_through [:browser, :require_authenticated_user]
 
     live "/", Live.Phail
     live "/search/:search_filter/", Live.Phail, :search
@@ -51,5 +54,40 @@ defmodule PhailWeb.Router do
 
   if Mix.env() == :dev do
     forward "/sent_emails", Bamboo.SentEmailViewerPlug
+  end
+
+  ## Authentication routes
+
+  scope "/", PhailWeb do
+    pipe_through [:browser, :redirect_if_user_is_authenticated]
+
+    #  
+    #  Disable account registration.
+    #
+    # get "/users/register", UserRegistrationController, :new
+    # post "/users/register", UserRegistrationController, :create
+    get "/users/log_in", UserSessionController, :new
+    post "/users/log_in", UserSessionController, :create
+    get "/users/reset_password", UserResetPasswordController, :new
+    post "/users/reset_password", UserResetPasswordController, :create
+    get "/users/reset_password/:token", UserResetPasswordController, :edit
+    put "/users/reset_password/:token", UserResetPasswordController, :update
+  end
+
+  scope "/", PhailWeb do
+    pipe_through [:browser, :require_authenticated_user]
+
+    get "/users/settings", UserSettingsController, :edit
+    put "/users/settings", UserSettingsController, :update
+    get "/users/settings/confirm_email/:token", UserSettingsController, :confirm_email
+  end
+
+  scope "/", PhailWeb do
+    pipe_through [:browser]
+
+    delete "/users/log_out", UserSessionController, :delete
+    get "/users/confirm", UserConfirmationController, :new
+    post "/users/confirm", UserConfirmationController, :create
+    get "/users/confirm/:token", UserConfirmationController, :confirm
   end
 end

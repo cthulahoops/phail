@@ -24,7 +24,7 @@ defmodule MessageTest do
 
     test "Can set a message status to sent", %{message: message} do
       Message.set_status(message, :sent)
-      message = Message.get(message.id)
+      message = Message.get(message.user, message.id)
       assert message.status == :sent
     end
   end
@@ -41,7 +41,7 @@ defmodule MessageTest do
       assert message.date == nil
       Message.send(message)
 
-      message = Message.get(message.id)
+      message = Message.get(message.user, message.id)
       assert message.date != nil
     end
   end
@@ -51,14 +51,14 @@ defmodule MessageTest do
       user = user_fixture()
       message = message_fixture(Conversation.create(user, "Test Message"))
 
-      %{message_id: message.id}
+      %{user: user, message_id: message.id}
     end
 
-    test "Add and remove an address", %{message_id: message_id} do
+    test "Add and remove an address", %{user: user, message_id: message_id} do
       valid_address = valid_message_address()
 
       message =
-        Message.get(message_id)
+        Message.get(user, message_id)
         |> Message.add_address(:to, valid_address)
 
       [address] = message.message_addresses

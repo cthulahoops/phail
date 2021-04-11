@@ -72,12 +72,12 @@ defmodule Phail.Message do
     })
     |> Repo.insert!()
 
-    get(message.id)
+    get(message.user, message.id)
   end
 
   def remove_address(message, address_id) do
     Phail.MessageAddress.get(address_id) |> Repo.delete!()
-    get(message.id)
+    get(message.user, message.id)
   end
 
   def delete(message) do
@@ -119,9 +119,10 @@ defmodule Phail.Message do
     ])
   end
 
-  def get(id) do
+  def get(user, id) do
     Message
-    |> Repo.get(id)
+    |> where([m], m.user_id == ^user.id)
+    |> Repo.get!(id)
     |> Repo.preload([
       :user,
       :message_addresses,

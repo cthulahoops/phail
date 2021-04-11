@@ -64,13 +64,13 @@ defmodule PhailWeb.Live.Phail do
     if is_expanded(String.to_integer(conversation_id), socket.assigns.expanded) do
       socket |> assign(:expanded, nil)
     else
-      socket |> assign(:expanded, Conversation.get(conversation_id))
+      socket |> assign(:expanded, Conversation.get(socket.assigns.current_user, conversation_id))
     end
     |> noreply
   end
 
   def handle_event("move", %{"id" => conversation_id, "target" => target}, socket) do
-    change_labels(conversation_id, socket.assigns.label, target)
+    change_labels(socket.assigns.current_user, conversation_id, socket.assigns.label, target)
 
     socket
     |> assign(:expanded, nil)
@@ -79,7 +79,7 @@ defmodule PhailWeb.Live.Phail do
   end
 
   def handle_event("discard", %{"message_id" => message_id}, socket) do
-    Message.get(message_id) |> Message.delete()
+    Message.get(socket.assigns.current_user, message_id) |> Message.delete()
 
     socket
     |> assign(:expanded, nil)
@@ -87,8 +87,8 @@ defmodule PhailWeb.Live.Phail do
     |> noreply
   end
 
-  defp change_labels(conversation_id, old_label, new_label) do
-    conversation = Conversation.get(conversation_id)
+  defp change_labels(user, conversation_id, old_label, new_label) do
+    conversation = Conversation.get(user, conversation_id)
 
     if old_label != nil do
       Conversation.remove_label(conversation.id, old_label)

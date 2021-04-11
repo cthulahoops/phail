@@ -123,9 +123,10 @@ defmodule Phail.Conversation do
     |> Repo.delete_all()
   end
 
-  def get(id) do
+  def get(user, id) do
     Conversation
-    |> Repo.get(id)
+    |> where([c], c.user_id == ^user.id)
+    |> Repo.get!(id)
     |> Repo.preload(:labels)
     |> Repo.preload(
       messages:

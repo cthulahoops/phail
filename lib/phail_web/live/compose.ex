@@ -21,18 +21,18 @@ defmodule PhailWeb.Live.Compose do
   end
 
   defp mount(%{"message_id" => message_id}, socket) do
-    message = Message.get(message_id)
+    message = Message.get(socket.assigns.current_user, message_id)
 
     socket
     |> assign(:message, message)
-    |> assign(:conversation, Conversation.get(message.conversation.id))
+    |> assign(:conversation, Conversation.get(socket.assigns.current_user, message.conversation.id))
     |> assign(:to_input, %AddressInput{})
     |> assign(:cc_input, %AddressInput{})
     |> ok
   end
 
   defp mount(%{"reply_to" => reply_to}, socket) do
-    reply_to = Message.get(reply_to)
+    reply_to = Message.get(socket.assigns.current_user, reply_to)
 
     socket
     |> assign(:reply_to, reply_to)

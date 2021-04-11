@@ -15,6 +15,6 @@ defmodule Phail.ConversationFixtures do
     for _ <- 1..Map.get(attrs, :num_messages, 1) do
       message_fixture(conversation)
     end
-    conversation
+    conversation |> Phail.Repo.preload(:messages)
   end
 end

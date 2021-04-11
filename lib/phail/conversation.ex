@@ -39,23 +39,17 @@ defmodule Phail.Conversation do
     search("label:inbox")
   end
 
-  def search(search_term) do
+  def search(user, search_term) do
     query = Query.parse(search_term)
 
-    select_conversations()
+    select_conversations(user)
     |> text_search(Enum.join(query.text_terms, " & "))
     |> filter_labels(query.labels)
     |> filter_message_statuses(query.statuses)
     |> Repo.all()
   end
 
-  def select_by_label(label) do
-    select_conversations()
-    |> filter_label(label)
-    |> Repo.all()
-  end
-
-  defp select_conversations() do
+  defp select_conversations(user) do
     address_query =
       from ma in MessageAddress,
         where: ma.type == "from"
@@ -66,6 +60,7 @@ defmodule Phail.Conversation do
         order_by: m.date
 
     from c in Conversation,
+      where: c.user_id == ^user.id,
       join: m in assoc(c, :messages),
       select_merge: %{date: max(m.date)},
       group_by: c.id,

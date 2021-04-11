@@ -8,6 +8,11 @@ defmodule Phail.ConversationFixtures do
 
   def conversation_fixture(user, attrs \\ %{}) do
     conversation = valid_conversation(attrs)
-    Phail.Conversation.create(user, conversation.subject, is_draft: conversation.is_draft)
+
+    conversation = Phail.Conversation.create(user, conversation.subject, is_draft: conversation.is_draft)
+    for _ <- 1..Map.get(attrs, :num_messages, 1) do
+      message_fixture(conversation)
+    end
+    conversation
   end
 end

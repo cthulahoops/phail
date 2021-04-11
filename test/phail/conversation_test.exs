@@ -2,7 +2,9 @@ defmodule ConversationTest do
   use ExUnit.Case
   alias Phail.Repo
   import Phail.AccountsFixtures
-  alias Phail.{Conversation, Message}
+  alias Phail.{Conversation}
+
+  import Phail.{MessageFixtures, ConversationFixtures}
 
   defp conversation_ids(conversation_list) do
     for c <- conversation_list, do: c.id
@@ -15,24 +17,12 @@ defmodule ConversationTest do
   describe "Fetch conversations by status" do
     setup do
       user = user_fixture()
-      sent_conversation = Conversation.create(user, "Test Conversation")
 
-      Message.create(
-        user,
-        sent_conversation,
-        subject: "Test Message",
-        body: "Some body text for the message",
-        status: :sent
-      )
+      sent_conversation = conversation_fixture(user, %{subject: "Sent"})
+      message_fixture(sent_conversation, %{status: :sent})
 
-      received_conversation = Conversation.create(user, "Not a sent conversation")
-
-      Message.create(
-        user,
-        received_conversation,
-        subject: "Received!",
-        body: "I received this"
-      )
+      received_conversation = conversation_fixture(user, %{subject: "Received"})
+      message_fixture(received_conversation)
 
       %{sent_conversation: sent_conversation}
     end

@@ -23,7 +23,7 @@ defmodule Phail.Message do
     has_many(:message_addresses, MessageAddress)
   end
 
-  def create(user, conversation, options \\ []) do
+  def create(conversation, options \\ []) do
     from = Keyword.get(options, :from, [])
     to = Keyword.get(options, :to, [])
     subject = Keyword.get(options, :subject, "")
@@ -33,7 +33,7 @@ defmodule Phail.Message do
 
     message =
       %Message{
-        user: user,
+        user: conversation.user,
         subject: subject,
         body: body,
         status: status,

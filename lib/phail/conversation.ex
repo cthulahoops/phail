@@ -26,11 +26,11 @@ defmodule Phail.Conversation do
     )
   end
 
-  def create(user, subject) do
+  def create(user, subject, attrs \\ []) do
     %Conversation{
       user: user,
       subject: subject,
-      is_draft: true
+      is_draft: Keyword.get(attrs, :is_draft, true)
     }
     |> Repo.insert!()
   end

@@ -6,6 +6,8 @@ defmodule MessageTest do
   alias Phail.{Conversation, Message}
 
   import Phail.AccountsFixtures
+  import Phail.MessageAddressFixtures
+  import Phail.MessageFixtures
 
   setup do
     :ok = Ecto.Adapters.SQL.Sandbox.checkout(Repo)
@@ -14,16 +16,8 @@ defmodule MessageTest do
   describe "Can set the status on a message" do
     setup do
       user = user_fixture()
-
       conversation = Conversation.create(user, "Test Message")
-
-      message =
-        Message.create(
-          user,
-          conversation,
-          subject: "Test Message",
-          body: "Some body text for the message"
-        )
+      message = message_fixture(conversation)
 
       %{message: message}
     end
@@ -39,16 +33,7 @@ defmodule MessageTest do
     setup do
       user = user_fixture()
       conversation = Conversation.create(user, "Test Message")
-
-      message =
-        Message.create(
-          user,
-          conversation,
-          subject: "Test Message",
-          body: "Some body text for the message",
-          to: [%{name: "Person", address: "person@example.com"}]
-        )
-
+      message = message_fixture(conversation, %{to: [valid_message_address()]})
       %{message: message}
     end
 
@@ -64,8 +49,8 @@ defmodule MessageTest do
   describe "Message updates" do
     setup do
       user = user_fixture()
-      conversation = Conversation.create(user, "Test Message")
-      message = Message.create(user, conversation, subject: "Test", body: "Test body")
+      message = message_fixture(Conversation.create(user, "Test Message"))
+
       %{message_id: message.id}
     end
 

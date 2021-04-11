@@ -167,7 +167,6 @@ defmodule PhailWeb.Live.Compose do
     if is_nil(socket.assigns.message.id) do
       message =
         Message.create(
-          socket.assigns.current_user,
           Conversation.create(socket.assigns.current_user, "Draft Message"),
           status: :draft
         )

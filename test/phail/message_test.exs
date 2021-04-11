@@ -55,14 +55,16 @@ defmodule MessageTest do
     end
 
     test "Add and remove an address", %{message_id: message_id} do
+      valid_address = valid_message_address()
+
       message =
         Message.get(message_id)
-        |> Message.add_address(:to, %{name: "Aaa Bbb", address: "aaa@example.com"})
+        |> Message.add_address(:to, valid_address)
 
       [address] = message.message_addresses
 
-      assert address.address == "aaa@example.com"
-      assert address.name == "Aaa Bbb"
+      assert address.address == valid_address.address
+      assert address.name == valid_address.name
       assert address.type == :to
 
       message = Message.remove_address(message, address.id)

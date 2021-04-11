@@ -1,4 +1,6 @@
 defmodule Phail.ConversationFixtures do
+  import Phail.MessageFixtures
+
   def valid_conversation(attrs \\ %{}) do
     Enum.into(attrs, %{
       subject: Faker.Pizza.combo(),

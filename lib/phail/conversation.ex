@@ -35,10 +35,6 @@ defmodule Phail.Conversation do
     |> Repo.insert!()
   end
 
-  def search("") do
-    search("label:inbox")
-  end
-
   def search(user, search_term) do
     query = Query.parse(search_term)
 

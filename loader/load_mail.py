@@ -43,20 +43,20 @@ def insert_message_address(user_id, address_type, message_id, address):
     )
 
 
-def create_label(name):
+def create_label(user_id, name):
     cursor = dbh.cursor()
-    cursor.execute("insert into labels (name) values (%s) returning (id)", (name,))
+    cursor.execute("insert into labels (user_id, name) values (%s, %s) returning (id)", (user_id, name,))
     return cursor.fetchone()[0]
 
 
-def get_label(name):
+def get_label(user_id, name):
     cursor = dbh.cursor()
-    cursor.execute("select id from labels where name = %s", (name,))
-    return cursor.fetchone() or create_label(name)
+    cursor.execute("select id from labels where name = %s and user_id = %s", (name, user_id))
+    return cursor.fetchone() or create_label(user_id, name)
 
 
-def insert_label_assoc(conversation_id, label_name):
-    label_id = get_label(label_name)
+def insert_label_assoc(user_id, conversation_id, label_name):
+    label_id = get_label(user_id, label_name)
     cursor = dbh.cursor()
     cursor.execute(
         "insert into conversation_labels (conversation_id, label_id) values (%s, %s) on conflict do nothing",
@@ -72,27 +72,27 @@ def insert_reference(message_id, reference):
         )
 
 
-def get_referenced_conversations(message):
+def get_referenced_conversations(user_id, message):
     with dbh.cursor() as cursor:
         cursor.execute(
             """select distinct messages.conversation_id
             from messages
             join message_references on messages.message_id = message_references.reference
             join messages myself on myself.id = message_references.message_id
-            where myself.message_id = %s""",
-            (message.message_id,),
+            where myself.message_id = %s and messages.user_id = %s""",
+            (message.message_id, user_id),
         )
         return list(cursor.fetchall())
 
 
-def get_referencing_conversations(message):
+def get_referencing_conversations(user_id, message):
     with dbh.cursor() as cursor:
         cursor.execute(
             """select distinct messages.conversation_id
             from messages
             join message_references on messages.id = message_references.message_id
-            where message_references.reference = %s""",
-            (message.message_id,),
+            where message_references.reference = %s and user_id = %s""",
+            (message.message_id, user_id),
         )
         return list(cursor.fetchall())
 
@@ -106,7 +106,7 @@ def get_new_conversation(user_id, message):
         return cursor.fetchone()[0]
 
 
-def get_mutual_references(message):
+def get_mutual_references(user_id, message):
     references = tuple(message.references)
     if not references:
         return []
@@ -116,8 +116,8 @@ def get_mutual_references(message):
         cursor.execute(
             """select distinct conversation_id from messages
                 join message_references on messages.id = message_references.message_id
-                where reference in %s""",
-            (references,),
+                where reference in %s and user_id = %s""",
+            (references, user_id),
         )
         return list(cursor.fetchall())
 
@@ -162,9 +162,9 @@ def merge_conversations(conversation_ids):
 
 def get_conversation(user_id, message):
     return merge_conversations(
-        get_referenced_conversations(message)
-        + get_referencing_conversations(message)
-        + get_mutual_references(message)
+        get_referenced_conversations(user_id, message)
+        + get_referencing_conversations(user_id, message)
+        + get_mutual_references(user_id, message)
     ) or get_new_conversation(user_id, message)
 
 
@@ -200,7 +200,7 @@ def insert_message(user_id, message, extra_labels=()):
     for label in message.labels + list(extra_labels):
         if label.lower() in ignore_labels:
             continue
-        insert_label_assoc(conversation_id, label)
+        insert_label_assoc(user_id, conversation_id, label)
 
     dbh.commit()
 

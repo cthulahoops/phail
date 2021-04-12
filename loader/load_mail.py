@@ -38,7 +38,9 @@ def insert_message_address(user_id, address_type, message_id, address):
         (user_id, message_id, type, address, name)
         values (%s, %s, %s, %s, %s) on conflict do nothing"""
     cursor = dbh.cursor()
-    cursor.execute(sql, (user_id, message_id, address_type, address["email"], address["name"]))
+    cursor.execute(
+        sql, (user_id, message_id, address_type, address["email"], address["name"])
+    )
 
 
 def create_label(name):
@@ -232,8 +234,19 @@ def load_messages_from_file_or_directory(user_id, input_filename):
         i += 1
 
 
+def get_user_id(recipient):
+    with dbh.cursor() as cursor:
+        cursor.execute("select id from users where email = %s", (recipient,))
+        row = cursor.fetchone()
+    if row:
+        (user_id,) = row
+        return user_id
+    return None
+
+
 def main():
     parser = argparse.ArgumentParser("Load mail into phail")
+    parser.add_argument("recipient")
     parser.add_argument(
         "-c", "--stdin", action="store_true", help="Read a message from stdin."
     )
@@ -243,7 +256,11 @@ def main():
     parser.add_argument("paths", nargs="*", help="Paths to mbox or maildir input")
     args = parser.parse_args()
 
-    user_id = 1
+    user_id = get_user_id(args.recipient)
+
+    if not user_id:
+        print(f"User does not exist: {args.recipient}")
+        sys.exit(1)
 
     if args.stdin:
         message = read_message_from_stdin()

@@ -102,23 +102,6 @@ defmodule Phail.Message do
     message
   end
 
-  defp text_search(search_term) do
-    from m in Message,
-      where:
-        fragment(
-          "to_tsvector('english', body || ' ' || subject) @@ to_tsquery('english', ?)",
-          ^search_term
-        )
-  end
-
-  def search(search_term) do
-    text_search(search_term)
-    |> Repo.all()
-    |> Repo.preload([
-      :message_addresses
-    ])
-  end
-
   def get(user, id) do
     Message
     |> where([m], m.user_id == ^user.id)
@@ -128,10 +111,6 @@ defmodule Phail.Message do
       :message_addresses,
       :conversation
     ])
-  end
-
-  def all() do
-    Message |> Repo.all() |> Repo.preload([:message_addresses])
   end
 
   def set_status(message, status) do

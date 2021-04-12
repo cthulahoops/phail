@@ -31,4 +31,16 @@ defmodule PhailWeb.PageLiveTest do
     refute disconnected_html =~ "Private Label"
     refute render(page_live) =~ "Private Label"
   end
+
+  test "Can change the labels on a message.", %{conn: conn, current_user: current_user} do
+    conversation = conversation_fixture(current_user, %{labels: ["Existing", "Other"]})
+
+    conn = conn |> log_in_user(current_user)
+    {:ok, view, _disconnected_html} = live(conn, "/label/Existing")
+
+    view |> render_click("move", %{"id" => conversation.id, "target" => "New"})
+
+    assert Enum.sort(["New", "Other"]) == Enum.sort(for l <- Phail.Conversation.get(current_user, conversation.id).labels, do: l.name)
+  end
+
 end

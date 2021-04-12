@@ -89,7 +89,7 @@ defmodule PhailWeb.Live.Compose do
 
   def handle_event("add_address", %{"input_id" => input_id, "id" => id}, socket) do
     socket
-    |> add_address(address_type(input_id), MessageAddress.get(id))
+    |> add_address(address_type(input_id), MessageAddress.get(socket.assigns.current_user, id))
     |> update_suggestions(input_id, "")
     |> noreply
   end
@@ -105,9 +105,9 @@ defmodule PhailWeb.Live.Compose do
     |> noreply
   end
 
-  def handle_event("remove_address", %{"input_id" => _input_id, "id" => id}, socket) do
+  def handle_event("remove_address", %{"input_id" => _input_id, "id" => address_id}, socket) do
     socket
-    |> update_message(fn message -> Message.remove_address(message, id) end)
+    |> update_message(fn message -> Message.remove_address(message, address_id) end)
     |> noreply
   end
 

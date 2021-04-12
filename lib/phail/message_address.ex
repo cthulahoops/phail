@@ -17,8 +17,12 @@ defmodule Phail.MessageAddress do
     belongs_to(:user, Phail.Accounts.User)
   end
 
-  def get(message, id) do
-    MessageAddress |> where([ma], ma.message_id == ^message.id) |> Repo.get(id)
+  def get(user = %Phail.Accounts.User{}, id) do
+    MessageAddress |> where([ma], ma.user_id == ^user.id) |> Repo.get!(id)
+  end
+
+  def get(message = %Phail.Message{}, id) do
+    MessageAddress |> where([ma], ma.message_id == ^message.id) |> Repo.get!(id)
   end
 
   def prefix_search(_user, "") do

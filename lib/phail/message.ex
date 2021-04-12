@@ -76,7 +76,7 @@ defmodule Phail.Message do
   end
 
   def remove_address(message, address_id) do
-    Phail.MessageAddress.get(address_id) |> Repo.delete!()
+    Phail.MessageAddress.get(message, address_id) |> Repo.delete!()
     get(message.user, message.id)
   end
 

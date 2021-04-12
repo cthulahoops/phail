@@ -16,9 +16,29 @@ defmodule PhailWeb.ComposeLiveTest do
 
     {:ok, view, _disconnected_html} = live(conn, "/compose")
 
-    view
-    |> render_hook("add_address", Enum.into(%{"input_id" => "to_input"}, valid_message_address()))
+    address = valid_message_address()
+
+    view = view |> render_hook("add_address", Enum.into(%{"input_id" => "to_input"}, address))
+
+    assert view =~ address.name
   end
+
+  test "Add a copy of an existing address to a message", %{conn: conn, user: user} do
+    conn = conn |> log_in_user(user)
+
+    {:ok, view, _disconnected_html} = live(conn, "/compose")
+
+    conversation = conversation_fixture(user, %{num_messages: 0})
+    message = message_fixture(conversation, %{to: [valid_message_address()]})
+    message = Phail.Message.get(user, message.id)
+
+    address = hd(message.message_addresses)
+
+    view = view |> render_hook("add_address", %{"input_id" => "to_input", "id" => address.id})
+
+    assert view =~ address.name
+  end
+
 
   describe "Can't edit or reply to another users message" do
     setup do

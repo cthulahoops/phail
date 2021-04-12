@@ -13,6 +13,7 @@ defmodule PhailWeb.Live.Phail do
 
   def mount(_params, session, socket) do
     socket = PhailWeb.LiveHelpers.assign_defaults(socket, session)
+
     socket
     |> assign(:expanded, nil)
     |> assign(:labels, Label.all(socket.assigns.current_user))
@@ -48,7 +49,11 @@ defmodule PhailWeb.Live.Phail do
   end
 
   defp assign_conversations(socket) do
-    assign(socket, :conversations, Conversation.search(socket.assigns.current_user, socket.assigns.search_filter))
+    assign(
+      socket,
+      :conversations,
+      Conversation.search(socket.assigns.current_user, socket.assigns.search_filter)
+    )
   end
 
   def handle_event("update_filter", %{"filter" => filter}, socket) do

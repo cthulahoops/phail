@@ -39,7 +39,6 @@ defmodule PhailWeb.ComposeLiveTest do
     assert view =~ address.name
   end
 
-
   describe "Can't edit or reply to another users message" do
     setup do
       current_user = user_fixture()
@@ -48,22 +47,32 @@ defmodule PhailWeb.ComposeLiveTest do
       message_id = hd(conversation.messages).id
 
       %{
-        current_user: current_user, 
+        current_user: current_user,
         conversation: conversation,
         message_id: message_id
       }
     end
 
-    test "can't access /compose/<message_id>/ ", %{conn: conn, current_user: current_user, message_id: message_id, conversation: _conversation} do
+    test "can't access /compose/<message_id>/ ", %{
+      conn: conn,
+      current_user: current_user,
+      message_id: message_id,
+      conversation: _conversation
+    } do
       conn = conn |> log_in_user(current_user)
 
-      assert_raise Ecto.NoResultsError, fn -> live(conn, "/compose/#{ message_id }") end
+      assert_raise Ecto.NoResultsError, fn -> live(conn, "/compose/#{message_id}") end
     end
 
-    test "can't access /compose/<reply_to>/", %{conn: conn, current_user: current_user, message_id: message_id, conversation: _conversation} do
+    test "can't access /compose/<reply_to>/", %{
+      conn: conn,
+      current_user: current_user,
+      message_id: message_id,
+      conversation: _conversation
+    } do
       conn = conn |> log_in_user(current_user)
 
-      assert_raise Ecto.NoResultsError, fn -> live(conn, "/reply/#{ message_id }") end
+      assert_raise Ecto.NoResultsError, fn -> live(conn, "/reply/#{message_id}") end
     end
   end
 
@@ -76,22 +85,42 @@ defmodule PhailWeb.ComposeLiveTest do
       %{current_user: current_user, address: address}
     end
 
-    test "it appears when we search using the name", %{conn: conn, current_user: current_user, address: address} do
+    test "it appears when we search using the name", %{
+      conn: conn,
+      current_user: current_user,
+      address: address
+    } do
       conn = conn |> log_in_user(current_user)
 
       {:ok, view, _} = live(conn, "/compose/")
 
-      view = view |> render_change("change", %{"to" => String.slice(address.name, 0, 3), "_target" => ["to"]})
+      view =
+        view
+        |> render_change("change", %{
+          "to" => String.slice(address.name, 0, 3),
+          "_target" => ["to"]
+        })
+
       assert view =~ address.address
       assert view =~ address.name
     end
 
-    test "it appears when we search using the address", %{conn: conn, current_user: current_user, address: address} do
+    test "it appears when we search using the address", %{
+      conn: conn,
+      current_user: current_user,
+      address: address
+    } do
       conn = conn |> log_in_user(current_user)
 
       {:ok, view, _} = live(conn, "/compose/")
 
-      view = view |> render_change("change", %{"to" => String.slice(address.address, 0, 3), "_target" => ["to"]})
+      view =
+        view
+        |> render_change("change", %{
+          "to" => String.slice(address.address, 0, 3),
+          "_target" => ["to"]
+        })
+
       assert view =~ address.address
       assert view =~ address.name
     end

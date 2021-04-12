@@ -25,7 +25,10 @@ defmodule PhailWeb.Live.Compose do
 
     socket
     |> assign(:message, message)
-    |> assign(:conversation, Conversation.get(socket.assigns.current_user, message.conversation.id))
+    |> assign(
+      :conversation,
+      Conversation.get(socket.assigns.current_user, message.conversation.id)
+    )
     |> assign(:to_input, %AddressInput{})
     |> assign(:cc_input, %AddressInput{})
     |> ok

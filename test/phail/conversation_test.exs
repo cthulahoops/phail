@@ -50,7 +50,7 @@ defmodule ConversationTest do
       assert [] == Conversation.search(me, "Private")
     end
 
-    test "You can see your own message", %{you: you, conversation: conversation}do
+    test "You can see your own message", %{you: you, conversation: conversation} do
       assert [conversation.id] == conversation_ids(Conversation.search(you, "Private"))
     end
   end
@@ -61,9 +61,13 @@ defmodule ConversationTest do
     conversation = conversation_fixture(current_user, %{labels: ["first label", "second label"]})
 
     conversation = Conversation.add_labels(conversation, ["third label", "fourth label"])
-    assert Enum.sort(label_names(conversation.labels)) == Enum.sort(["first label", "second label", "third label", "fourth label"])
+
+    assert Enum.sort(label_names(conversation.labels)) ==
+             Enum.sort(["first label", "second label", "third label", "fourth label"])
 
     conversation = Conversation.remove_label(conversation, "third label")
-    assert Enum.sort(label_names(conversation.labels)) == Enum.sort(["first label", "second label", "fourth label"])
+
+    assert Enum.sort(label_names(conversation.labels)) ==
+             Enum.sort(["first label", "second label", "fourth label"])
   end
 end

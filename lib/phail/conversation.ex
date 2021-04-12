@@ -109,7 +109,10 @@ defmodule Phail.Conversation do
   end
 
   def add_labels(conversation, label_names) do
-    labels = Enum.map(label_names, fn label_name -> Label.get_or_create(conversation.user, label_name) end)
+    labels =
+      Enum.map(label_names, fn label_name ->
+        Label.get_or_create(conversation.user, label_name)
+      end)
 
     Changeset.change(conversation)
     |> Changeset.put_assoc(:labels, labels ++ conversation.labels)
@@ -124,6 +127,7 @@ defmodule Phail.Conversation do
       where: l.name == ^label_name
     )
     |> Repo.delete_all()
+
     Conversation.get(conversation.user, conversation.id)
   end
 

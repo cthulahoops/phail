@@ -9,3 +9,7 @@
 #
 # We recommend using the bang functions (`insert!`, `update!`
 # and so on) as they will fail if something goes wrong.
+
+for account <- Application.get_env(:phail, :default_accounts, []) do
+  Phail.Accounts.register_user(account)
+end

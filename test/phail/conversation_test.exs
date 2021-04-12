@@ -10,6 +10,10 @@ defmodule ConversationTest do
     for c <- conversation_list, do: c.id
   end
 
+  defp label_names(labels) do
+    for l <- labels, do: l.name
+  end
+
   setup do
     :ok = Ecto.Adapters.SQL.Sandbox.checkout(Repo)
   end
@@ -31,7 +35,6 @@ defmodule ConversationTest do
 
       assert [sent_conversation.id] == conversation_ids(conversations)
     end
-
   end
 
   describe "Search only returns my own messages" do
@@ -50,5 +53,17 @@ defmodule ConversationTest do
     test "You can see your own message", %{you: you, conversation: conversation}do
       assert [conversation.id] == conversation_ids(Conversation.search(you, "Private"))
     end
+  end
+
+  test "Adding and removing labels works" do
+    current_user = user_fixture()
+
+    conversation = conversation_fixture(current_user, %{labels: ["first label", "second label"]})
+
+    conversation = Conversation.add_labels(conversation, ["third label", "fourth label"])
+    assert Enum.sort(label_names(conversation.labels)) == Enum.sort(["first label", "second label", "third label", "fourth label"])
+
+    conversation = Conversation.remove_label(conversation, "third label")
+    assert Enum.sort(label_names(conversation.labels)) == Enum.sort(["first label", "second label", "fourth label"])
   end
 end

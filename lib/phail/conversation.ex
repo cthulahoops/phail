@@ -104,23 +104,27 @@ defmodule Phail.Conversation do
     |> where([_c, m, _l], m.status == ^status)
   end
 
-  # TODO Write a test to check this works.
   def add_label(conversation, label_name) do
-    label = Label.get_or_create(label_name)
+    add_labels(conversation, [label_name])
+  end
+
+  def add_labels(conversation, label_names) do
+    labels = Enum.map(label_names, fn label_name -> Label.get_or_create(conversation.user, label_name) end)
 
     Changeset.change(conversation)
-    |> Changeset.put_assoc(:labels, [label | conversation.labels])
+    |> Changeset.put_assoc(:labels, labels ++ conversation.labels)
     |> Repo.update!()
   end
 
-  def remove_label(conversation_id, label_name) do
+  def remove_label(conversation, label_name) do
     from(cl in "conversation_labels",
       join: l in Label,
       on: l.id == cl.label_id,
-      where: cl.conversation_id == ^conversation_id,
+      where: cl.conversation_id == ^conversation.id,
       where: l.name == ^label_name
     )
     |> Repo.delete_all()
+    Conversation.get(conversation.user, conversation.id)
   end
 
   def get(user, id) do

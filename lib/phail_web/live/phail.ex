@@ -12,10 +12,10 @@ defmodule PhailWeb.Live.Phail do
   end
 
   def mount(_params, session, socket) do
+    socket = PhailWeb.LiveHelpers.assign_defaults(socket, session)
     socket
-    |> PhailWeb.LiveHelpers.assign_defaults(session)
     |> assign(:expanded, nil)
-    |> assign(:labels, Label.all())
+    |> assign(:labels, Label.all(socket.assigns.current_user))
     |> ok
   end
 
@@ -91,7 +91,7 @@ defmodule PhailWeb.Live.Phail do
     conversation = Conversation.get(user, conversation_id)
 
     if old_label != nil do
-      Conversation.remove_label(conversation.id, old_label)
+      Conversation.remove_label(conversation, old_label)
     end
 
     Conversation.add_label(conversation, new_label)

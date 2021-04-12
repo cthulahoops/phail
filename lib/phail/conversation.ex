@@ -135,7 +135,7 @@ defmodule Phail.Conversation do
     Conversation
     |> where([c], c.user_id == ^user.id)
     |> Repo.get!(id)
-    |> Repo.preload(:labels)
+    |> Repo.preload([:labels, :user])
     |> Repo.preload(
       messages:
         from(m in Message,

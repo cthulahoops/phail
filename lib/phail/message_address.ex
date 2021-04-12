@@ -17,20 +17,21 @@ defmodule Phail.MessageAddress do
     belongs_to(:user, Phail.Accounts.User)
   end
 
-  def get(id) do
-    MessageAddress |> Repo.get(id)
+  def get(message, id) do
+    MessageAddress |> where([ma], ma.message_id == ^message.id) |> Repo.get(id)
   end
 
-  def prefix_search("") do
+  def prefix_search(_user, "") do
     []
   end
 
-  def prefix_search(prefix_string) do
+  def prefix_search(user, prefix_string) do
     search_pattern = "#{prefix_string}%"
 
     from(a in MessageAddress,
       distinct: [a.name, a.address],
       select: %{id: a.id, name: a.name, address: a.address},
+      where: a.user_id == ^user.id,
       where:
         ilike(a.name, ^search_pattern) or
           ilike(a.address, ^search_pattern),

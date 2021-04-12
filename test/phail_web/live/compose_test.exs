@@ -2,8 +2,9 @@ defmodule PhailWeb.ComposeLiveTest do
   use PhailWeb.ConnCase
 
   import Phail.AccountsFixtures
-  import Phail.MessageAddressFixtures
   import Phail.ConversationFixtures
+  import Phail.MessageFixtures
+  import Phail.MessageAddressFixtures
   import Phoenix.LiveViewTest
 
   setup do
@@ -43,6 +44,36 @@ defmodule PhailWeb.ComposeLiveTest do
       conn = conn |> log_in_user(current_user)
 
       assert_raise Ecto.NoResultsError, fn -> live(conn, "/reply/#{ message_id }") end
+    end
+  end
+
+  describe "Address appears in the prefix search" do
+    setup do
+      current_user = user_fixture()
+      address = valid_message_address()
+      conversation = conversation_fixture(current_user, %{num_messages: 0})
+      message_fixture(conversation, %{to: [address]})
+      %{current_user: current_user, address: address}
+    end
+
+    test "it appears when we search using the name", %{conn: conn, current_user: current_user, address: address} do
+      conn = conn |> log_in_user(current_user)
+
+      {:ok, view, _} = live(conn, "/compose/")
+
+      view = view |> render_change("change", %{"to" => String.slice(address.name, 0, 3), "_target" => ["to"]})
+      assert view =~ address.address
+      assert view =~ address.name
+    end
+
+    test "it appears when we search using the address", %{conn: conn, current_user: current_user, address: address} do
+      conn = conn |> log_in_user(current_user)
+
+      {:ok, view, _} = live(conn, "/compose/")
+
+      view = view |> render_change("change", %{"to" => String.slice(address.address, 0, 3), "_target" => ["to"]})
+      assert view =~ address.address
+      assert view =~ address.name
     end
   end
 end

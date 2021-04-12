@@ -60,8 +60,6 @@ defmodule PhailWeb.Live.Compose do
   end
 
   def handle_event("change", mail_data = %{"to" => input_value, "_target" => ["to"]}, socket) do
-    IO.inspect({:change, mail_data})
-
     socket
     |> update_suggestions(:to_input, input_value)
     |> update_message(fn message -> Message.update_draft(message, mail_data) end)
@@ -153,7 +151,7 @@ defmodule PhailWeb.Live.Compose do
   defp update_suggestions(socket, input, input_value, _last_input_value) do
     socket
     |> assign(input, %AddressInput{
-      suggestions: MessageAddress.prefix_search(input_value),
+      suggestions: MessageAddress.prefix_search(socket.assigns.current_user, input_value),
       input_value: input_value
     })
   end

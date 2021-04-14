@@ -96,7 +96,7 @@ window.multiInput = () => {
     suggestion: (index) => {
       return {
         '@click': 'addItem($dispatch, $event.originalTarget)',
-        '@mouseover': function () { console.log('Mouse over: ', index); this.active = index },
+        '@mouseover': function () { this.active = index },
         'x-bind:class': function () { return { 'active-suggestion': this.active === index } }
       }
     }

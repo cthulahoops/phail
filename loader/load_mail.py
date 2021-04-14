@@ -45,13 +45,18 @@ def insert_message_address(user_id, address_type, message_id, address):
 
 def create_label(user_id, name):
     cursor = dbh.cursor()
-    cursor.execute("insert into labels (user_id, name) values (%s, %s) returning (id)", (user_id, name,))
+    cursor.execute(
+        "insert into labels (user_id, name) values (%s, %s) returning (id)",
+        (user_id, name,),
+    )
     return cursor.fetchone()[0]
 
 
 def get_label(user_id, name):
     cursor = dbh.cursor()
-    cursor.execute("select id from labels where name = %s and user_id = %s", (name, user_id))
+    cursor.execute(
+        "select id from labels where name = %s and user_id = %s", (name, user_id)
+    )
     return cursor.fetchone() or create_label(user_id, name)
 
 
@@ -201,6 +206,11 @@ def insert_message(user_id, message, extra_labels=()):
         if label.lower() in ignore_labels:
             continue
         insert_label_assoc(user_id, conversation_id, label)
+
+    cursor.execute(
+        "insert into originals (user_id, message_id, text) values (%(user_id)s, %(message_id)s, %(text)s)",
+        dict(user_id=user_id, message_id=message_id, text=message.text),
+    )
 
     dbh.commit()
 

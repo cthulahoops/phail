@@ -1,4 +1,4 @@
-<form phx-submit="submit" phx-change="change">
+<form id="compose-form" phx-submit="submit" phx-change="change">
 <ul class=form-items>
   <li><label for="to_input">To</label>
     <%= PhailView.address_input("to", Phail.Message.to_addresses(@message), @to_input.suggestions) %>

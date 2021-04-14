@@ -62,17 +62,14 @@ defmodule PhailWeb.Live.Compose do
     noreply(socket)
   end
 
-  def handle_event("change", mail_data = %{"to" => input_value, "_target" => ["to"]}, socket) do
-    socket
-    |> update_suggestions(:to_input, input_value)
-    |> update_message(fn message -> Message.update_draft(message, mail_data) end)
-    |> noreply
-  end
+  def handle_event("change", mail_data, socket) do
+    socket = socket |> update_suggestions(mail_data)
 
-  def handle_event("change", mail_data = %{"cc" => input_value, "_target" => ["cc"]}, socket) do
-    socket
-    |> update_suggestions(:cc_input, input_value)
-    |> update_message(fn message -> Message.update_draft(message, mail_data) end)
+    if mail_data["subject"] != "" or mail_data["body"] != "" do
+      socket |> update_message(fn message -> Message.update_draft(message, mail_data) end)
+    else
+      socket
+    end
     |> noreply
   end
 
@@ -132,6 +129,18 @@ defmodule PhailWeb.Live.Compose do
     push_redirect(socket,
       to: Routes.phail_path(socket, :label, "Inbox")
     )
+  end
+
+  defp update_suggestions(socket, %{"to" => input_value, "_target" => ["to"]}) do
+    update_suggestions(socket, :to_input, input_value)
+  end
+
+  defp update_suggestions(socket, %{"cc" => input_value, "_target" => ["cc"]}) do
+    update_suggestions(socket, :cc_input, input_value)
+  end
+
+  defp update_suggestions(socket, %{}) do
+    socket
   end
 
   defp update_suggestions(socket, "to_input", input_value) do

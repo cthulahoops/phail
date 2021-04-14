@@ -125,4 +125,35 @@ defmodule PhailWeb.ComposeLiveTest do
       assert view =~ address.name
     end
   end
+
+  test "Message drafts are saved in the database.", %{conn: conn, user: current_user} do
+    conn = conn |> log_in_user(current_user)
+    {:ok, view, _} = live(conn, "/compose/")
+
+    rendered = view
+      |> element("#compose-form")
+      |> render_change(%{
+        "subject" => "Test Subject",
+        "body" => ""
+      })
+
+   # assert_patch view, "/compose/1"
+
+    assert rendered =~ "Test Subject"
+
+    rendered = view
+      |> element("#compose-form")
+      |> render_change(%{
+        "subject" => "Test Subject",
+        "body" => "Body!"
+      })
+
+    assert rendered =~ "Test Subject"
+    assert rendered =~ "Body!"
+
+    # message = Message.get(current_user, message_id)
+    #
+    # assert message.subject = "Hi there, world"
+    # assert message.body = "Body!"
+  end
 end

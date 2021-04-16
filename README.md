@@ -1,5 +1,21 @@
 # Phail
 
+A modern webmail client in developed with [Phoenix LiveView](https://github.com/phoenixframework/phoenix_live_view).
+
+![Screenshot of Mailbox](/mailbox_screenshot.png?raw=true)
+
+# Goals
+
+* Host your own e-mail!
+* Conversation oriented interface.
+* Full text search, labels, reply later.
+
+# Status
+
+Under development. Not currently deployed or deployable in production.
+
+# Development Setup
+
 To start your Phoenix server:
 
   * Install dependencies with `mix deps.get`
@@ -9,12 +25,6 @@ To start your Phoenix server:
 
 Now you can visit [`localhost:4000`](http://localhost:4000) from your browser.
 
-Ready to run in production? Please [check our deployment guides](https://hexdocs.pm/phoenix/deployment.html).
+# Testing
 
-## Learn more
-
-  * Official website: https://www.phoenixframework.org/
-  * Guides: https://hexdocs.pm/phoenix/overview.html
-  * Docs: https://hexdocs.pm/phoenix
-  * Forum: https://elixirforum.com/c/phoenix-forum
-  * Source: https://github.com/phoenixframework/phoenix
+Run: `mix test`

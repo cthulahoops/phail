@@ -34,12 +34,12 @@ defmodule PhailWeb.Live.Compose do
     |> ok
   end
 
-  defp mount(%{"reply_to" => reply_to}, socket) do
+  defp mount(%{"reply_type" => reply_type, "reply_to" => reply_to}, socket) do
     reply_to = Message.get(socket.assigns.current_user, reply_to)
 
     socket
     |> assign(:reply_to, reply_to)
-    |> new_reply(reply_to)
+    |> new_reply(reply_type, reply_to)
     |> ok
   end
 
@@ -193,11 +193,11 @@ defmodule PhailWeb.Live.Compose do
     assign(socket, :message, fun.(socket.assigns.message))
   end
 
-  defp new_reply(socket, reply_to) do
-    message = Phail.Reply.create(reply_to)
+  defp new_reply(socket, reply_type, reply_to) do
+    message = Phail.Reply.create(reply_type, reply_to)
 
     assign(socket, :message, message)
-    |> push_redirect(to: Routes.compose_path(socket, :reply_to_draft, reply_to.id, message.id))
+    |> push_redirect(to: Routes.compose_path(socket, :message_id, message.id))
   end
 
   def handle_info(_, socket) do

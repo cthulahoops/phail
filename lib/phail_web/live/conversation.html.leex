@@ -49,7 +49,8 @@
         phx-value-message_id="<%= message.id %>"
         >Discard</a>
       <% else %>
-      <%= link "Reply", to: Routes.compose_path(@socket, :reply_to, message.id), class: "button" %>
+      <%= link "Reply", to: Routes.compose_path(@socket, :reply, "one", message.id), class: "button" %>
+      <%= link "Reply All", to: Routes.compose_path(@socket, :reply, "all", message.id), class: "button" %>
       <%= link "Show Original", to: Routes.phail_path(@socket, :original, message.id), class: "button" %>
       <% end %>
 

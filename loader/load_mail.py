@@ -82,10 +82,8 @@ def get_referenced_conversations(user_id, message):
         cursor.execute(
             """select distinct messages.conversation_id
             from messages
-            join message_references on messages.message_id = message_references.reference
-            join messages myself on myself.id = message_references.message_id
-            where myself.message_id = %s and messages.user_id = %s""",
-            (message.message_id, user_id),
+            where message_id in %s and user_id = %s""",
+            (tuple(message.references), user_id),
         )
         return list(cursor.fetchall())
 

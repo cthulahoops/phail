@@ -31,6 +31,8 @@ defmodule Phail.Message do
     cc = Keyword.get(options, :cc, [])
     status = Keyword.get(options, :status)
 
+    conversation = conversation |> Repo.preload(:user)
+
     message =
       %Message{
         user: conversation.user,

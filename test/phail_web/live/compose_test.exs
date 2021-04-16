@@ -130,18 +130,20 @@ defmodule PhailWeb.ComposeLiveTest do
     conn = conn |> log_in_user(current_user)
     {:ok, view, _} = live(conn, "/compose/")
 
-    rendered = view
+    rendered =
+      view
       |> element("#compose-form")
       |> render_change(%{
         "subject" => "Test Subject",
         "body" => ""
       })
 
-   # assert_patch view, "/compose/1"
+    # assert_patch view, "/compose/1"
 
     assert rendered =~ "Test Subject"
 
-    rendered = view
+    rendered =
+      view
       |> element("#compose-form")
       |> render_change(%{
         "subject" => "Test Subject",

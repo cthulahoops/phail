@@ -16,7 +16,10 @@ defmodule PhailWeb.Live.Phail do
 
     socket
     |> assign(:expanded, nil)
-    |> assign(:labels, Label.all(socket.assigns.current_user))
+    |> assign(
+      :labels,
+      Label.all(socket.assigns.current_user) |> Enum.filter(fn label -> label.name != "inbox" end)
+    )
     |> ok
   end
 

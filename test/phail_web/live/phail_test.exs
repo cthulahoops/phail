@@ -40,7 +40,9 @@ defmodule PhailWeb.PageLiveTest do
 
     view |> render_click("move", %{"id" => conversation.id, "target" => "New"})
 
-    assert Enum.sort(["New", "Other"]) == Enum.sort(for l <- Phail.Conversation.get(current_user, conversation.id).labels, do: l.name)
+    assert Enum.sort(["New", "Other"]) ==
+             Enum.sort(
+               for l <- Phail.Conversation.get(current_user, conversation.id).labels, do: l.name
+             )
   end
-
 end

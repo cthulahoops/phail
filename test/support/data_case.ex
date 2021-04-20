@@ -52,4 +52,10 @@ defmodule Phail.DataCase do
       end)
     end)
   end
+
+  def address_list(message_addresses) do
+    for message_address <- message_addresses do
+      %{"name" => message_address.name, "address" => message_address.address}
+    end
+  end
 end

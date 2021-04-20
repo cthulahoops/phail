@@ -7,6 +7,8 @@ defmodule Phail.Reply do
       to: reply_to_addresses(original_message, reply_type),
       cc: reply_cc_addresses(original_message, reply_type),
       subject: subject_with_re_prefix(original_message.subject),
+      references: [original_message.message_id | Message.references(original_message)],
+      in_reply_to: original_message.message_id,
       status: "draft"
     )
   end

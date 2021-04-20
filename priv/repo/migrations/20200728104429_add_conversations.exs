@@ -12,7 +12,7 @@ defmodule Phail.Repo.Migrations.AddConversations do
     end
 
     create table(:message_references, primary_key: false) do
-      add :message_id, references(:messages)
+      add :message_id, references(:messages, on_delete: :delete_all)
       add :reference, :text
     end
 

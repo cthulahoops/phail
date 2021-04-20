@@ -8,6 +8,7 @@ defmodule Phail.Message do
   alias Phail.Repo
   alias Phail.Conversation
   alias Phail.MessageAddress
+  alias Phail.MessageReference
 
   defenum(MessageStatus, :message_status, [:draft, :outbox, :sent])
 
@@ -17,10 +18,12 @@ defmodule Phail.Message do
     field(:date, :utc_datetime)
     field(:status, MessageStatus)
     field(:message_id, :string)
+    field(:in_reply_to, :string)
     belongs_to(:conversation, Conversation)
 
     belongs_to(:user, Phail.Accounts.User)
     has_many(:message_addresses, MessageAddress)
+    has_many(:message_references, MessageReference)
   end
 
   def create(conversation, options \\ []) do
@@ -30,6 +33,8 @@ defmodule Phail.Message do
     body = Keyword.get(options, :body, "")
     cc = Keyword.get(options, :cc, [])
     status = Keyword.get(options, :status)
+    references = Keyword.get(options, :references, [])
+    in_reply_to = Keyword.get(options, :in_reply_to)
 
     conversation = conversation |> Repo.preload(:user)
 
@@ -39,6 +44,7 @@ defmodule Phail.Message do
         subject: subject,
         body: body,
         status: status,
+        in_reply_to: in_reply_to,
         message_addresses: [],
         conversation: conversation,
         message_id: new_message_id()
@@ -57,7 +63,11 @@ defmodule Phail.Message do
       add_address(message, :cc, address)
     end
 
-    message
+    for reference <- references do
+      add_reference(message, reference)
+    end
+
+    get(message.user, message.id)
   end
 
   def add_address(message, address_type, %{address: address, name: name}) do
@@ -80,6 +90,20 @@ defmodule Phail.Message do
   def remove_address(message, address_id) do
     Phail.MessageAddress.get(message, address_id) |> Repo.delete!()
     get(message.user, message.id)
+  end
+
+  def add_reference(message, reference) do
+    message
+    |> Ecto.build_assoc(:message_references, %{reference: reference})
+    |> Repo.insert!()
+  end
+
+  def references(message = %Message{}) do
+    message = message |> Repo.preload(:message_references)
+
+    for reference <- message.message_references do
+      reference.reference
+    end
   end
 
   def delete(message) do
@@ -139,7 +163,9 @@ defmodule Phail.Message do
         html_body: message.body,
         headers: [
           {"Message-Id", message.message_id},
-          {"Date", Calendar.DateTime.Format.rfc2822(local_datetime)}
+          {"Date", Calendar.DateTime.Format.rfc2822(local_datetime)},
+          {"In-Reply-To", message.in_reply_to},
+          {"References", Enum.join(references(message), " ")}
         ]
       )
 

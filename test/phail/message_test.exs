@@ -49,7 +49,7 @@ defmodule MessageTest do
   describe "Message updates" do
     setup do
       user = user_fixture()
-      message = message_fixture(Conversation.create(user, "Test Message"))
+      message = message_fixture(Conversation.create(user, "Test Message"), %{to: [], from: []})
 
       %{user: user, message_id: message.id}
     end
@@ -60,6 +60,7 @@ defmodule MessageTest do
       message =
         Message.get(user, message_id)
         |> Message.add_address(:to, valid_address)
+        |> Repo.preload(:message_addresses)
 
       [address] = message.message_addresses
 

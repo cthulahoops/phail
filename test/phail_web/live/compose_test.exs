@@ -64,7 +64,7 @@ defmodule PhailWeb.ComposeLiveTest do
       assert_raise Ecto.NoResultsError, fn -> live(conn, "/compose/#{message_id}") end
     end
 
-    test "can't access /compose/<reply_to>/", %{
+    test "can't access /reply/one/<reply_to>/", %{
       conn: conn,
       current_user: current_user,
       message_id: message_id,
@@ -72,7 +72,7 @@ defmodule PhailWeb.ComposeLiveTest do
     } do
       conn = conn |> log_in_user(current_user)
 
-      assert_raise Ecto.NoResultsError, fn -> live(conn, "/reply/#{message_id}") end
+      assert_raise Ecto.NoResultsError, fn -> live(conn, "/reply/one/#{message_id}") end
     end
   end
 

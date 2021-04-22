@@ -24,6 +24,8 @@ config :phail, PhailWeb.Endpoint,
     ]
   ]
 
+config :phail, Phail.Mailer, adapter: Phail.SMTPAdapter
+
 # ## SSL Support
 #
 # In order to use HTTPS in development, a self-signed

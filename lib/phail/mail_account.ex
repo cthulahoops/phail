@@ -56,6 +56,10 @@ defmodule Phail.MailAccount do
     Phail.MailAccount |> Repo.get_by!(user_id: user.id)
   end
 
+  def all() do
+    Phail.MailAccount |> Repo.all |> Repo.preload(:user)
+  end
+
   defimpl Bamboo.Formatter, for: Phail.MailAccount do
     def format_email_address(account, _opts) do
       {account.name, account.email}

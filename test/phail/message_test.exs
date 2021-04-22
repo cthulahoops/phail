@@ -33,8 +33,10 @@ defmodule MessageTest do
     setup do
       user = user_fixture()
       conversation = Conversation.create(user, "Test Message")
-      message = message_fixture(conversation, %{to: [valid_message_address()]})
-      %{message: message}
+
+      sender = %{address: user.email, name: "Whatever"}
+      message = message_fixture(conversation, %{to: [valid_message_address()], from: [sender]})
+      %{message: message, sender: sender}
     end
 
     test "Sending sets message date.", %{message: message} do
@@ -43,6 +45,14 @@ defmodule MessageTest do
 
       message = Message.get(message.user, message.id)
       assert message.date != nil
+
+      assert_delivered_email_matches(%{})
+    end
+
+    test "Message is sent with correct from address", %{message: message, sender: sender} do
+      Message.send(message)
+
+      assert_email_delivered_with(from: {sender.name, sender.address})
     end
   end
 

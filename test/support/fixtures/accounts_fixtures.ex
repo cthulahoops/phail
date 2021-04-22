@@ -20,6 +20,8 @@ defmodule Phail.AccountsFixtures do
       |> valid_user_attributes()
       |> Phail.Accounts.register_user()
 
+    Phail.MailAccountsFixtures.mail_account_fixture(user)
+
     user
   end
 

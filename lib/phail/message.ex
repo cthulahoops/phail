@@ -154,9 +154,11 @@ defmodule Phail.Message do
 
     local_datetime = Calendar.DateTime.shift_zone!(utc_datetime, "Europe/London")
 
+    [from_address] = Message.from_addresses(message)
+
     email =
       Email.new_email(
-        from: Application.fetch_env!(:phail, :email_sender),
+        from: Phail.MailAccount.get_by_email(from_address.address),
         to: Message.to_addresses(message),
         cc: Message.cc_addresses(message),
         subject: message.subject,

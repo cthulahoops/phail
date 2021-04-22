@@ -175,10 +175,13 @@ defmodule PhailWeb.Live.Compose do
 
   defp ensure_message(socket) do
     if is_nil(socket.assigns.message.id) do
+      mail_account = Phail.MailAccount.get_by_user(socket.assigns.current_user)
+
       message =
         Message.create(
           Conversation.create(socket.assigns.current_user, "Draft Message"),
-          status: :draft
+          status: :draft,
+          from: [%{name: mail_account.name, address: mail_account.email}]
         )
 
       assign(socket, :message, message)

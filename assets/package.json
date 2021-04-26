@@ -7,7 +7,7 @@
     "watch": "webpack --mode development --watch"
   },
   "dependencies": {
-    "alpinejs": "github:cthulahoops/alpine#3a64cd0092bc48b7ea235cc7c99b1fb45c3de497",
+    "alpinejs": "git+https://github.com/cthulahoops/alpine.git#3a64cd0092bc48b7ea235cc7c99b1fb45c3de497",
     "nprogress": "^0.2.0",
     "phoenix": "file:../deps/phoenix",
     "phoenix_html": "file:../deps/phoenix_html",

@@ -14,7 +14,7 @@ defmodule ReplyTest do
   test "Create a reply to a simple message." do
     current_user = user_fixture()
     message = message_fixture(conversation_fixture(current_user))
-    reply = Reply.create("one", message)
+    reply = Reply.create(current_user, "one", message)
     assert reply.status == :draft
 
     assert Phail.DataCase.address_list(Message.to_addresses(reply)) ==
@@ -27,7 +27,7 @@ defmodule ReplyTest do
     message = message_fixture(conversation)
     message_2 = message_fixture(conversation, %{references: [message.message_id]})
 
-    reply = Reply.create("one", message_2)
+    reply = Reply.create(current_user, "one", message_2)
 
     assert reply.status == :draft
     assert reply.in_reply_to == message_2.message_id

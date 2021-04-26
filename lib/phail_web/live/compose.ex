@@ -175,16 +175,14 @@ defmodule PhailWeb.Live.Compose do
 
   defp ensure_message(socket) do
     if is_nil(socket.assigns.message.id) do
-      mail_account = Phail.MailAccount.get_by_user(socket.assigns.current_user)
-
       message =
-        Message.create(
+        Message.create_draft(
           Conversation.create(socket.assigns.current_user, "Draft Message"),
-          status: :draft,
-          from: [%{name: mail_account.name, address: mail_account.email}]
+          Phail.MailAccount.get_by_user(socket.assigns.current_user)
         )
 
-      assign(socket, :message, message)
+      socket
+      |> assign(:message, message)
       |> push_patch(to: Routes.compose_path(socket, :message_id, message.id))
     else
       socket
@@ -197,7 +195,7 @@ defmodule PhailWeb.Live.Compose do
   end
 
   defp new_reply(socket, reply_type, reply_to) do
-    message = Phail.Reply.create(reply_type, reply_to)
+    message = Phail.Reply.create(socket.assigns.current_user, reply_type, reply_to)
 
     assign(socket, :message, message)
     |> push_redirect(to: Routes.compose_path(socket, :message_id, message.id))

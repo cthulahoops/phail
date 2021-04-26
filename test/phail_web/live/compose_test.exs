@@ -39,6 +39,41 @@ defmodule PhailWeb.ComposeLiveTest do
     assert view =~ address.name
   end
 
+  describe "Reply" do
+    setup do
+      current_user = user_fixture()
+      conversation = conversation_fixture(current_user)
+      message_id = hd(conversation.messages).id
+
+      %{
+        current_user: current_user,
+        conversation: conversation,
+        message_id: message_id
+      }
+    end
+
+    test "has the correct from address", %{
+      conn: conn,
+      current_user: current_user,
+      conversation: conversation,
+      message_id: message_id
+    } do
+      conn = conn |> log_in_user(current_user)
+
+      {:error, {:live_redirect, %{to: to}}} = live(conn, "/reply/one/#{message_id}")
+
+      conversation = Phail.Conversation.get(current_user, conversation.id)
+      message = Enum.find(conversation.messages, fn message -> message.status == :draft end)
+
+      from_address = Phail.Message.from_address(message)
+
+      assert from_address.address == current_user.email
+      assert to == "/compose/#{message.id}"
+
+      #  assert_redirect view, "/compose/#{message.id}"
+    end
+  end
+
   describe "Can't edit or reply to another users message" do
     setup do
       current_user = user_fixture()

@@ -26,6 +26,15 @@ defmodule Phail.Message do
     has_many(:message_references, MessageReference)
   end
 
+  def create_draft(conversation, from_account, options \\ []) do
+    options =
+      options
+      |> Keyword.put(:from, [%{name: from_account.name, address: from_account.email}])
+      |> Keyword.put(:status, :draft)
+
+    create(conversation, options)
+  end
+
   def create(conversation, options \\ []) do
     from = Keyword.get(options, :from, [])
     to = Keyword.get(options, :to, [])
@@ -187,6 +196,13 @@ defmodule Phail.Message do
 
   def from_addresses(message) do
     for m = %MessageAddress{type: :from} <- message.message_addresses, do: m
+  end
+
+  def from_address(message) do
+    case from_addresses(message) do
+      [from_address] -> from_address
+      [] -> nil
+    end
   end
 
   def to_addresses(message) do

@@ -1,7 +1,7 @@
 {
   "repository": {},
   "description": " ",
-  "license": "MIT",
+  "license": "",
   "scripts": {
     "deploy": "webpack --mode production",
     "watch": "webpack --mode development --watch"

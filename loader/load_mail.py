@@ -78,6 +78,9 @@ def insert_reference(message_id, reference):
 
 
 def get_referenced_conversations(user_id, message):
+    if not message.references:
+        return []
+
     with dbh.cursor() as cursor:
         cursor.execute(
             """select distinct messages.conversation_id

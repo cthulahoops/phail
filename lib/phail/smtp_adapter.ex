@@ -68,17 +68,26 @@ defmodule Phail.SMTPAdapter do
     end
   end
 
-  def deliver(email, _config) do
+  def deliver(email = %Bamboo.Email{private: private}, _config) do
     gen_smtp_config = smtp_server_config(email)
 
-    IO.inspect(gen_smtp_config)
+    smtp_message =
+      {_, _, message_text} =
+      email
+      |> Bamboo.Mailer.normalize_addresses()
+      |> to_gen_smtp_message
 
-    email
-    |> Bamboo.Mailer.normalize_addresses()
-    |> to_gen_smtp_message
-    |> IO.inspect()
-    |> :gen_smtp_client.send_blocking(gen_smtp_config)
-    |> handle_response
+    case :gen_smtp_client.send_blocking(smtp_message, gen_smtp_config) do
+      response when is_binary(response) ->
+        Phail.Original.save(private, message_text)
+        {:ok, response}
+
+      {:error, :no_credentials = reason} ->
+        raise SMTPError, {reason, "Username and password were not provided for authentication."}
+
+      {:error, reason, detail} ->
+        raise SMTPError, {reason, detail}
+    end
   end
 
   @doc false
@@ -90,18 +99,6 @@ defmodule Phail.SMTPAdapter do
 
   @doc false
   def supports_attachments?, do: true
-
-  defp handle_response({:error, :no_credentials = reason}) do
-    raise SMTPError, {reason, "Username and password were not provided for authentication."}
-  end
-
-  defp handle_response({:error, reason, detail}) do
-    raise SMTPError, {reason, detail}
-  end
-
-  defp handle_response(response) do
-    {:ok, response}
-  end
 
   defp add_bcc(body, %Bamboo.Email{bcc: []}) do
     body

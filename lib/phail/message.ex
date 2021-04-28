@@ -179,13 +179,14 @@ defmodule Phail.Message do
           {"References", Enum.join(references(message), " ")}
         ]
       )
+      |> Email.put_private(:id, message.id)
+      |> Email.put_private(:user_id, message.user_id)
 
     message.conversation
     |> Changeset.cast(%{"is_draft" => false}, [:is_draft])
     |> Repo.update!()
 
     set_status(message, :outbox)
-
     Phail.Mailer.deliver_now(email)
     set_status(message, :sent)
   end

@@ -56,7 +56,8 @@ defmodule Phail.MixProject do
       {:ecto_enum, "~> 1.4"},
       {:calendar, "~> 1.0.0"},
       {:phx_gen_auth, "~> 0.7", only: [:dev], runtime: false},
-      {:faker, "~> 0.16", only: [:test, :dev]}
+      {:faker, "~> 0.16", only: [:test, :dev]},
+      {:credo, "~> 1.4", only: [:dev, :test], runtime: false}
     ]
   end
 

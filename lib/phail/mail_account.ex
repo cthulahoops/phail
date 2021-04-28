@@ -57,7 +57,7 @@ defmodule Phail.MailAccount do
   end
 
   def all() do
-    Phail.MailAccount |> Repo.all |> Repo.preload(:user)
+    Phail.MailAccount |> Repo.all() |> Repo.preload(:user)
   end
 
   defimpl Bamboo.Formatter, for: Phail.MailAccount do

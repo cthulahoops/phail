@@ -133,7 +133,7 @@ defmodule Phail.Accounts.UserToken do
     from t in Phail.Accounts.UserToken, where: t.user_id == ^user.id
   end
 
-  def user_and_contexts_query(user, [_ | _] = contexts) do
+  def user_and_contexts_query(user, contexts = [_ | _]) do
     from t in Phail.Accounts.UserToken, where: t.user_id == ^user.id and t.context in ^contexts
   end
 end

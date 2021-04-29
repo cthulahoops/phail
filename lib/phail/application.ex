@@ -14,9 +14,13 @@ defmodule Phail.Application do
       # Start the PubSub system
       {Phoenix.PubSub, name: Phail.PubSub},
       # Start the Endpoint (http/https)
-      PhailWeb.Endpoint
+      PhailWeb.Endpoint,
       # Start a worker by calling: Phail.Worker.start_link(arg)
       # {Phail.Worker, arg}
+      #
+      {Registry, keys: :unique, name: Phail.Fetchmail.Registry},
+      {DynamicSupervisor, name: Phail.Fetchmail.Supervisor, strategy: :one_for_one},
+      Phail.Fetchmail.Poller
     ]
 
     # See https://hexdocs.pm/elixir/Supervisor.html

@@ -28,7 +28,6 @@
       Drafts
       <% end %>
     </li>
-    </li>
     <%= for label <- @labels do %>
       <li>
         <%= live_patch to: Routes.phail_path(@socket, :label, label.name) do %>
@@ -55,12 +54,8 @@
       </div>
       <%= if !is_nil(@expanded) && conversation.id == @expanded.id do %>
       <div class="conversation_buttons">
-        <%= if @label != 'Inbox' do %>
-          <a
-            class="button"
-            phx-click="move"
-            phx-value-id="<%= conversation.id %>"
-            phx-value-target="Archived">Archive</a>
+        <%= if @label do %>
+          <a class="button" phx-click="remove_label" phx-value-id="<%= conversation.id %>">Remove Label</a>
         <% end %>
         <%= if @label == "Inbox" do %>
           <a

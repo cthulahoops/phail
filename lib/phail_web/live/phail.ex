@@ -86,6 +86,18 @@ defmodule PhailWeb.Live.Phail do
     |> noreply
   end
 
+  def handle_event("remove_label", %{"id" => conversation_id}, socket) do
+    conversation = Conversation.get(socket.assigns.current_user, conversation_id)
+    if socket.assigns.label do
+      Conversation.remove_label(conversation, socket.assigns.label)
+    end
+
+    socket
+    |> assign(:expanded, nil)
+    |> assign_conversations
+    |> noreply
+  end
+
   def handle_event("discard", %{"message_id" => message_id}, socket) do
     Message.get(socket.assigns.current_user, message_id) |> Message.delete()
 

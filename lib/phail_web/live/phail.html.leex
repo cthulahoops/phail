@@ -35,6 +35,9 @@
         <% end %>
       </li>
     <% end %>
+    <li>
+      <%= live_patch to: Routes.phail_path(@socket, :all) do %>All Mail<% end %>
+    </li>
   </ul>
 </div>
 

@@ -47,6 +47,14 @@ defmodule PhailWeb.Live.Phail do
     |> noreply
   end
 
+  def handle_params(%{}, _uri, socket) when socket.assigns.live_action == :all do
+    socket
+    |> assign(:search_filter, "")
+    |> assign(:label, nil)
+    |> assign_conversations
+    |> noreply
+  end
+
   def handle_params(%{}, uri, socket) do
     handle_params(%{"label" => "Inbox"}, uri, socket)
   end

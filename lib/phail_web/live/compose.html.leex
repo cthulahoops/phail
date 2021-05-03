@@ -1,5 +1,15 @@
 <form id="compose-form" phx-submit="submit" phx-change="change">
 <ul class=form-items>
+  <li>
+    <label for="from_input">From</label>
+    <div class="address-input input">
+      <%= for address <- Phail.Message.from_addresses(@message) do %>
+      <div class="message-recipient" title="<%= PhailView.format_address address %>">
+        <%= PhailView.address_name address %>
+      </div>
+      <% end %>
+    </div>
+  </li>
   <li><label for="to_input">To</label>
     <%= PhailView.address_input("to", Phail.Message.to_addresses(@message), @to_input.suggestions) %>
     </div>

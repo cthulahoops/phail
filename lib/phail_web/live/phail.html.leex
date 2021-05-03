@@ -29,7 +29,7 @@
   <%= for conversation <- @conversations do %>
     <li class="conversation">
       <div class="conversation-header clickable" phx-value-id="<%= conversation.id %>" phx-click="expand">
-        <%= PhailView.name_list conversation.from_addresses %>
+        <%= PhailView.conversation_senders conversation.from_addresses %>
         <span class=subject>
           <%= for label <- conversation.labels do %>
             <%= if label.name != @label do %>

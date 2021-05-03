@@ -110,7 +110,7 @@ main.container {
 }
 
 .conversation-header {
-  ul.sender-list {
+  .sender-list {
     display: inline-block;
     width: 20%;
   }
@@ -384,4 +384,8 @@ ul.comma-separated {
 .original {
   background: white;
   padding: 1em;
+}
+
+.less-important-text {
+  color: #aaa;
 }

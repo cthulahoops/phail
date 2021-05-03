@@ -1,19 +1,29 @@
 defmodule PhailWeb.PhailView do
   use PhailWeb, :view
 
-  def name_list(addresses) do
-    assigns = %{addresses: addresses}
+  def conversation_senders(addresses) do
+    assigns = %{}
+
+    uniq_addresses = Enum.uniq_by(addresses, fn address -> address.address end)
+    count = Enum.count(addresses)
 
     ~L"""
-        <ul class="sender-list comma-separated">
-        <%= if length(addresses) == 1 do %>
-          <li><%= address_name hd(addresses) %></li>
+        <div class="sender-list">
+        <ul class="comma-separated">
+        <%= if length(uniq_addresses) == 1 do %>
+          <li><%= address_name hd(uniq_addresses) %></li>
         <% else %>
-          <%= for address <- addresses do %>
+          <%= for address <- uniq_addresses do %>
             <li><%= address_short address %></li>
           <% end %>
         <% end %>
         </ul>
+        <%= if Enum.count(addresses) > Enum.count(uniq_addresses) do %>
+          <span class="less-important-text">
+          <%= count %>
+          </span>
+        <% end %>
+        </div>
     """
   end
 

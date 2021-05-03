@@ -31,5 +31,5 @@
 </form>
 
 <%= if !is_nil(@conversation) do %>
-    <%= live_component(@socket, PhailWeb.Live.Conversation, id: @conversation.id, conversation: @conversation) %>
+    <%= live_component(@socket, PhailWeb.Live.Conversation, id: @conversation.id, conversation: @conversation, exclude: @message.id) %>
 <% end %>

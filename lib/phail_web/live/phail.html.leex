@@ -70,7 +70,7 @@
           phx-value-target="Inbox">Move to Inbox</a>
         <% end %>
       </div>
-      <%= live_component(@socket, PhailWeb.Live.Conversation, id: @expanded.id, conversation: @expanded) %>
+      <%= live_component(@socket, PhailWeb.Live.Conversation, id: @expanded.id, conversation: @expanded, exclude: nil) %>
       <% end %>
     </li>
   <% end %>

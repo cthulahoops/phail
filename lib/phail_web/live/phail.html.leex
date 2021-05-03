@@ -13,11 +13,11 @@
 
 <div class="side">
   <ul class="navigation-list">
-    <li><%= PhailView.label_button(@socket, "Inbox") %></li>
+    <li><%= PhailView.label_navigation(@socket, "Inbox") %></li>
     <li><%= PhailView.navigation(@socket, {:is, :sent}, "Sent") %></li>
     <li><%= PhailView.navigation(@socket, {:is, :draft}, "Draft") %></li>
     <%= for label <- @labels do %>
-      <li><%= PhailView.label_button(@socket, label.name) %></li>
+      <li><%= PhailView.label_navigation(@socket, label.name) %></li>
     <% end %>
     <li><%= PhailView.navigation(@socket, :all, "All Mail") %></li>
   </ul>
@@ -33,7 +33,7 @@
         <span class=subject>
           <%= for label <- conversation.labels do %>
             <%= if label.name != @label do %>
-              <span class="conversation-label"><%= label.name %></span>
+              <%= PhailView.label_navigation(@socket, label.name, class: "conversation-label") %>
             <% end %>
           <% end %>
           <%= conversation.subject %></span>

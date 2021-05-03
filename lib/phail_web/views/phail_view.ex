@@ -84,8 +84,8 @@ defmodule PhailWeb.PhailView do
     end
   end
 
-  def label_button(socket, label_name) do
-    live_patch(to: Routes.phail_path(socket, :label, label_name)) do
+  def label_navigation(socket, label_name, opts \\ []) do
+    live_patch(Keyword.put(opts, :to, Routes.phail_path(socket, :label, label_name))) do
       label_name
     end
   end

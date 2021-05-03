@@ -14,6 +14,7 @@ defmodule Phail.Fetchmail do
     case Registry.lookup(Phail.Fetchmail.Registry, mail_account_id) do
       [{pid, _}] ->
         DynamicSupervisor.terminate_child(Phail.Fetchmail.Supervisor, pid)
+
       [] ->
         :ok
     end
@@ -46,8 +47,8 @@ defmodule Phail.Fetchmail do
     IO.puts(file, "password = #{mail_account.fetch_password}")
     IO.puts(file, "\n[destination]")
     IO.puts(file, "type = MDA_external")
-    IO.puts(file, "path = #{ mda_path }")
-    IO.puts(file, "arguments = #{ mda_args }")
+    IO.puts(file, "path = #{mda_path}")
+    IO.puts(file, "arguments = #{mda_args}")
   end
 
   defp gen_config(:fetchmail, file, mail_account, mda) do
@@ -62,10 +63,14 @@ defmodule Phail.Fetchmail do
   end
 
   defp split_mda(mda, deliver_to_email) do
-    [path|args] = String.split(mda)
-    args = for arg <- args ++ [deliver_to_email] do
-      "'#{arg}'"
-    end |> Enum.join(", ")
+    [path | args] = String.split(mda)
+
+    args =
+      for arg <- args ++ [deliver_to_email] do
+        "'#{arg}'"
+      end
+      |> Enum.join(", ")
+
     {path, "(#{args})"}
   end
 end

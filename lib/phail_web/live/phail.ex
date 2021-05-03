@@ -96,6 +96,7 @@ defmodule PhailWeb.Live.Phail do
 
   def handle_event("remove_label", %{"id" => conversation_id}, socket) do
     conversation = Conversation.get(socket.assigns.current_user, conversation_id)
+
     if socket.assigns.label do
       Conversation.remove_label(conversation, socket.assigns.label)
     end

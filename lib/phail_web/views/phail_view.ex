@@ -71,4 +71,22 @@ defmodule PhailWeb.PhailView do
 
   def address_short(%{address: address, name: ""}), do: address
   def address_short(%{name: name}), do: hd(String.split(name, " "))
+
+  def navigation(socket, type, text) when is_atom(type) do
+    live_patch(to: Routes.phail_path(socket, type)) do
+      text
+    end
+  end
+
+  def navigation(socket, {type, arg}, text) do
+    live_patch(to: Routes.phail_path(socket, type, arg)) do
+      text
+    end
+  end
+
+  def label_button(socket, label_name) do
+    live_patch(to: Routes.phail_path(socket, :label, label_name)) do
+      label_name
+    end
+  end
 end

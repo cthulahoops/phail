@@ -13,31 +13,13 @@
 
 <div class="side">
   <ul class="navigation-list">
-    <li>
-      <%= live_patch to: Routes.phail_path(@socket, :label, "Inbox") do %>
-        Inbox
-      <% end %>
-    </li>
-    <li>
-      <%= live_patch to: Routes.phail_path(@socket, :is, :sent) do %>
-        Sent
-      <% end %>
-    </li>
-    <li>
-      <%= live_patch to: Routes.phail_path(@socket, :is, :draft) do %>
-      Drafts
-      <% end %>
-    </li>
+    <li><%= PhailView.label_button(@socket, "Inbox") %></li>
+    <li><%= PhailView.navigation(@socket, {:is, :sent}, "Sent") %></li>
+    <li><%= PhailView.navigation(@socket, {:is, :draft}, "Draft") %></li>
     <%= for label <- @labels do %>
-      <li>
-        <%= live_patch to: Routes.phail_path(@socket, :label, label.name) do %>
-        <%= label.name %>
-        <% end %>
-      </li>
+      <li><%= PhailView.label_button(@socket, label.name) %></li>
     <% end %>
-    <li>
-      <%= live_patch to: Routes.phail_path(@socket, :all) do %>All Mail<% end %>
-    </li>
+    <li><%= PhailView.navigation(@socket, :all, "All Mail") %></li>
   </ul>
 </div>
 

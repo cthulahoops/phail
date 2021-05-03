@@ -44,7 +44,7 @@
   <ul class=mailbox>
   <%= for conversation <- @conversations do %>
     <li class="conversation">
-      <div class="conversation-header" phx-value-id="<%= conversation.id %>" phx-click="expand">
+      <div class="conversation-header clickable" phx-value-id="<%= conversation.id %>" phx-click="expand">
         <%= PhailView.name_list conversation.from_addresses %>
         <span class=subject>
           <%= for label <- conversation.labels do %>

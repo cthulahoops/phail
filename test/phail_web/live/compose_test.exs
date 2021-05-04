@@ -137,7 +137,7 @@ defmodule PhailWeb.ComposeLiveTest do
         })
 
       assert view =~ address.address
-      assert view =~ address.name
+      assert view =~ Phoenix.HTML.html_escape(address.name) |> Phoenix.HTML.safe_to_string()
     end
 
     test "it appears when we search using the address", %{
@@ -152,12 +152,12 @@ defmodule PhailWeb.ComposeLiveTest do
       view =
         view
         |> render_change("change", %{
-          "to" => String.slice(address.address, 0, 3),
+          "to" => String.slice(address.address, 0, 24),
           "_target" => ["to"]
         })
 
       assert view =~ address.address
-      assert view =~ address.name
+      assert view =~ Phoenix.HTML.html_escape(address.name) |> Phoenix.HTML.safe_to_string()
     end
   end
 

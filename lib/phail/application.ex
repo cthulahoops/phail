@@ -20,8 +20,11 @@ defmodule Phail.Application do
       #
       {Registry, keys: :unique, name: Phail.Fetchmail.Registry},
       {DynamicSupervisor, name: Phail.Fetchmail.Supervisor, strategy: :one_for_one},
-      Phail.Fetchmail.Poller
-    ]
+    ] ++ if Application.get_env(:phail, :start_account_pollers) do
+      [Phail.Fetchmail.Poller]
+    else
+      []
+    end
 
     # See https://hexdocs.pm/elixir/Supervisor.html
     # for other strategies and supported options

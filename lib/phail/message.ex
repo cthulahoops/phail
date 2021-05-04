@@ -171,7 +171,7 @@ defmodule Phail.Message do
         to: Message.to_addresses(message),
         cc: Message.cc_addresses(message),
         subject: message.subject,
-        html_body: message.body,
+        text_body: message.body,
         headers: [
           {"Message-Id", message.message_id},
           {"Date", Calendar.DateTime.Format.rfc2822(local_datetime)},

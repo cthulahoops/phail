@@ -41,6 +41,18 @@
       <%= raw message.body %>
       </div>
 
+      <div class=attachment-container>
+        <%= for file <- Phail.Attachment.get_message_files(message) do %>
+          <a href="<%= Routes.phail_path(@socket, :attachment, file.id) %>">
+            <%= if Phail.Attachment.is_image(file) do %>
+              <img src="<%= Routes.phail_path(@socket, :attachment, file.id) %>" style="height: 10em" title="<%= file.filename %>">
+            <% else %>
+              <%= file.filename %>
+            <% end %>
+          </a>
+        <% end %>
+      </div>
+
       <%= if message.status == :draft do %>
       <%= link "Edit", to: Routes.compose_path(@socket, :message_id, message.id), class: "button" %>
       <a

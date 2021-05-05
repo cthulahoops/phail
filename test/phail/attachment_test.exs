@@ -24,27 +24,37 @@ defmodule Phail.AttachmentTest do
     @invalid_attrs %{data: nil, content_type: nil, disposition: :other}
 
     def message_fixture() do
-      user = user_fixture()
+      message_fixture(user_fixture())
+    end
+
+    def message_fixture(user) do
       hd(conversation_fixture(user).messages)
     end
 
-    def file_fixture(attrs \\ %{}) do
-      {:ok, file} = Attachment.create_file(message_fixture(), Enum.into(attrs, @valid_attrs))
+    def file_fixture() do
+      file_fixture(user_fixture())
+    end
+
+    def file_fixture(user, attrs \\ %{}) do
+      {:ok, file} = Attachment.create_file(message_fixture(user), Enum.into(attrs, @valid_attrs))
       file
     end
 
     test "list_file/0 returns all file" do
-      file = file_fixture()
-      assert Attachment.list_file() == [file]
+      user = user_fixture()
+      file = file_fixture(user)
+      assert Attachment.list_file(user) == [file]
     end
 
     test "get_file!/1 returns the file with given id" do
-      file = file_fixture()
-      assert Attachment.get_file!(file.id) == file
+      user = user_fixture()
+      file = file_fixture(user)
+      assert Attachment.get_file!(user, file.id) == file
     end
 
     test "create_file/1 with valid data creates a file" do
-      message = message_fixture()
+      user = user_fixture()
+      message = message_fixture(user)
       assert {:ok, %File{} = file} = Attachment.create_file(message, @valid_attrs)
       assert file.data == "some data"
       assert file.content_type == "some content_type"
@@ -65,15 +75,17 @@ defmodule Phail.AttachmentTest do
     end
 
     test "update_file/2 with invalid data returns error changeset" do
-      file = file_fixture()
+      user = user_fixture()
+      file = file_fixture(user)
       assert {:error, %Ecto.Changeset{}} = Attachment.update_file(file, @invalid_attrs)
-      assert file == Attachment.get_file!(file.id)
+      assert file == Attachment.get_file!(user, file.id)
     end
 
     test "delete_file/1 deletes the file" do
-      file = file_fixture()
+      user = user_fixture()
+      file = file_fixture(user)
       assert {:ok, %File{}} = Attachment.delete_file(file)
-      assert_raise Ecto.NoResultsError, fn -> Attachment.get_file!(file.id) end
+      assert_raise Ecto.NoResultsError, fn -> Attachment.get_file!(user, file.id) end
     end
 
     test "change_file/1 returns a file changeset" do

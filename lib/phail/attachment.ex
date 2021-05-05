@@ -13,12 +13,12 @@ defmodule Phail.Attachment do
 
   ## Examples
 
-      iex> list_file()
+      iex> list_file(user)
       [%File{}, ...]
 
   """
-  def list_file do
-    Repo.all(File)
+  def list_file(user) do
+    File |> where([f], f.user_id == ^user.id) |> Repo.all()
   end
 
   @doc """
@@ -28,14 +28,14 @@ defmodule Phail.Attachment do
 
   ## Examples
 
-      iex> get_file!(123)
+      iex> get_file!(user, 123)
       %File{}
 
-      iex> get_file!(456)
+      iex> get_file!(user, 456)
       ** (Ecto.NoResultsError)
 
   """
-  def get_file!(id), do: Repo.get!(File, id)
+  def get_file!(user, id), do: File |> where([f], f.user_id == ^user.id) |> Repo.get!(id)
 
   @doc """
   Creates a file.
@@ -55,6 +55,12 @@ defmodule Phail.Attachment do
     %File{}
     |> File.changeset(attrs)
     |> Repo.insert()
+  end
+
+  def get_message_files(message = %Phail.Message{}) do
+    File
+    |> where([f], f.message_id == ^message.id)
+    |> Repo.all()
   end
 
   @doc """
@@ -102,5 +108,9 @@ defmodule Phail.Attachment do
   """
   def change_file(%File{} = file, attrs \\ %{}) do
     File.changeset(file, attrs)
+  end
+
+  def is_image(%File{content_type: content_type}) do
+    String.starts_with?(content_type, "image/")
   end
 end

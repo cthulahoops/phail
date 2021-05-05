@@ -31,6 +31,7 @@ defmodule PhailWeb.Router do
     live "/reply/:reply_type/:reply_to/", Live.Compose, :reply
 
     get "/original/:message_id", PhailController, :original
+    get "/attachment/:file_id", PhailController, :attachment
   end
 
   # Other scopes may use custom stacks.

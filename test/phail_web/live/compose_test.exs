@@ -20,7 +20,7 @@ defmodule PhailWeb.ComposeLiveTest do
 
     view = view |> render_hook("add_address", Enum.into(%{"input_id" => "to_input"}, address))
 
-    assert view =~ address.name
+    assert view =~ escaped_name(address)
   end
 
   test "Add a copy of an existing address to a message", %{conn: conn, user: user} do
@@ -36,7 +36,7 @@ defmodule PhailWeb.ComposeLiveTest do
 
     view = view |> render_hook("add_address", %{"input_id" => "to_input", "id" => address.id})
 
-    assert view =~ address.name
+    assert view =~ escaped_name(address)
   end
 
   describe "Reply" do
@@ -137,7 +137,7 @@ defmodule PhailWeb.ComposeLiveTest do
         })
 
       assert view =~ address.address
-      assert view =~ Phoenix.HTML.html_escape(address.name) |> Phoenix.HTML.safe_to_string()
+      assert view =~ escaped_name(address)
     end
 
     test "it appears when we search using the address", %{
@@ -157,7 +157,7 @@ defmodule PhailWeb.ComposeLiveTest do
         })
 
       assert view =~ address.address
-      assert view =~ Phoenix.HTML.html_escape(address.name) |> Phoenix.HTML.safe_to_string()
+      assert view =~ escaped_name(address)
     end
   end
 
@@ -192,5 +192,9 @@ defmodule PhailWeb.ComposeLiveTest do
     #
     # assert message.subject = "Hi there, world"
     # assert message.body = "Body!"
+  end
+
+  defp escaped_name(address) do
+    Phoenix.HTML.html_escape(address.name) |> Phoenix.HTML.safe_to_string()
   end
 end

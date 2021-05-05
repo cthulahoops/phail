@@ -1,6 +1,7 @@
 import email
 import email.utils
 import email.header
+import email.policy
 import datetime
 import pytz
 import base64
@@ -44,7 +45,7 @@ class Message:
         #     filename = fh.name
         self.text = text
         self.filename = filename
-        self.mail = email.message_from_bytes(self.text)
+        self.mail = email.message_from_bytes(self.text, policy=email.policy.default)
 
     @property
     def message_id(self):
@@ -113,6 +114,9 @@ class Message:
             print("Failure loading %r" % (self.filename,))
             raise
 
+    @property
+    def attachments(self):
+        yield from self.mail.iter_attachments()
 
 def htmlify(text):
     return text.replace(">", "&gt;").replace("<", "&lt;").replace("\n", "<br/>")

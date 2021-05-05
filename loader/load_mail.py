@@ -208,6 +208,29 @@ def insert_message(user_id, message, extra_labels=()):
             continue
         insert_label_assoc(user_id, conversation_id, label)
 
+    for attachment in message.attachments:
+        cursor.execute(
+            """insert into files
+                (user_id, message_id, data, content_type, disposition, filename, inserted_at, updated_at)
+                values (
+                    %(user_id)s,
+                    %(message_id)s,
+                    %(data)s,
+                    %(content_type)s,
+                    %(disposition)s,
+                    %(filename)s,
+                    now(),
+                    now())""",
+            dict(
+                user_id=user_id,
+                message_id=message_id,
+                data=attachment.get_content(),
+                content_type=attachment.get_content_type(),
+                disposition=attachment.get_content_disposition(),
+                filename=attachment.get_filename(),
+            ),
+        )
+
     cursor.execute(
         "insert into originals (user_id, message_id, text) values (%(user_id)s, %(message_id)s, %(text)s)",
         dict(user_id=user_id, message_id=message_id, text=message.text),
